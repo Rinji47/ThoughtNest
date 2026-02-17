@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} - ThoughtNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <article class="post-detail">
+        <div class="post-detail-meta">
+            {% if post.category %}
+            <span class="category-badge">{{ post.category.name }}</span>
+            {% endif %}
+            <h1 class="post-detail-title">{{ post.title }}</h1>
+            <div class="post-info">
+                <span class="author">By {{ post.author.get_full_name|default:post.author.username }}</span>
+                <span class="date">{{ post.created_at|date:"F j, Y" }}</span>
+            </div>
+        </div>
+
+        {% if post.featured_image %}
+        <div class="post-featured-image">
+            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 8px;">
+        </div>
+        {% endif %}
+
+        <div class="post-detail-content">
+            {{ post.content.html|safe }}
+        </div>
+
+        <!-- Like Section -->
+        <div class="post-actions">
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'post_toggle_like' post.pk %}">
+                {% csrf_token %}
+                <button class="like-btn" id="likeBtn" data-post-id="{{ post.pk }}">
+                    <i class="fa-solid fa-heart"></i> Like This Post <span class="like-count">{{ post.likes.count }}</span>
+                </button>
+            </form>
+            {% else %}
+            <p><a href="{% url 'login' %}">Log in</a> to like this post.</p>
+            {% endif %}
+        </div>
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+            <h2 class="comments-title">Comments</h2>
+
+            <!-- Add Comment Form -->
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'post_add_comment' post.pk %}" class="comment-form" id="commentForm">
+                {% csrf_token %}
+                <textarea name="content" placeholder="Write a comment..." class="comment-textarea" required></textarea>
+                <button type="submit" class="submit-comment-btn">Post Comment</button>
+            </form>
+            {% else %}
+            <p><a href="{% url 'login' %}">Log in</a> to comment.</p>
+            {% endif %}
+
+            <!-- Comments List -->
+            <div class="comments-list" id="commentsList">
+                {% for comment in comments %}
+                <div class="comment">
+                    <div class="comment-author">
+                        <strong>
+                            {% if comment.author %}
+                                {{ comment.author.get_full_name|default:comment.author.username }}
+                            {% else %}
+                                Guest
+                            {% endif %}
+                        </strong>
+                        <span class="comment-date">{{ comment.created_at|timesince }} ago</span>
+                    </div>
+                    <p class="comment-text">{{ comment.content }}</p>
+                </div>
+                {% empty %}
+                <p>No comments yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Related Posts -->
+    </article>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/post_detail.js' %}"></script>
+{% endblock %}

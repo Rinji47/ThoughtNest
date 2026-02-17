@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if mode == 'edit' %}Edit Post - ThoughtNest{% else %}New Post - ThoughtNest{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1 class="page-title">
+		{% if mode == 'edit' %}Edit Post{% else %}Create New Post{% endif %}
+	</h1>
+
+	<form method="post" class="post-form" enctype="multipart/form-data">
+		{% csrf_token %}
+		<div class="form-group">
+			<label for="postTitle">Title</label>
+			<input type="text" id="postTitle" name="title" value="{% if post %}{{ post.title }}{% endif %}" required>
+		</div>
+
+		<div class="form-group">
+			<label for="postCategory">Category</label>
+			<select id="postCategory" name="category">
+				<option value="">Select category</option>
+				{% for category in categories %}
+				<option value="{{ category.id }}" {% if post and post.category_id == category.id %}selected{% endif %}>
+					{{ category.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="postTags">Tags (comma-separated)</label>
+			<input type="text" id="postTags" name="tags" value="{% if post %}{% for tag in post.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}">
+		</div>
+
+		<div class="form-group">
+			<label for="postStatus">Status</label>
+			<select id="postStatus" name="status">
+				<option value="published" {% if post and post.status == 'published' %}selected{% endif %}>Published</option>
+				<option value="draft" {% if post and post.status == 'draft' %}selected{% endif %}>Draft</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="postImage">Featured Image</label>
+			<input type="file" id="postImage" name="featured_image" accept="image/*">
+			{% if post and post.featured_image %}
+			<div style="margin-top: 10px;">
+				<p>Current image:</p>
+				<img src="{{ post.featured_image.url }}" alt="Current featured image" style="max-width: 200px; height: auto;">
+			</div>
+			{% endif %}
+		</div>
+
+		<div class="form-group">
+			<label for="postContent">Content</label>
+			<textarea id="postContent" name="content" rows="10" required>{% if post %}{{ post.content.html|safe }}{% endif %}</textarea>
+		</div>
+
+		<button type="submit" class="btn-primary">
+			{% if mode == 'edit' %}Save Changes{% else %}Create Post{% endif %}
+		</button>
+	</form>
+</div>
+{% endblock %}

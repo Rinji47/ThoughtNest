@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard - ThoughtNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <p>Manage your blog content and settings</p>
+    </div>
+
+    <!-- Admin Tabs -->
+    <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="tab-btn" data-tab="posts">Manage Posts</button>
+        <button class="tab-btn" data-tab="comments">Manage Comments</button>
+        <button class="tab-btn" data-tab="subscriptions">Subscriptions</button>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <section id="dashboard" class="tab-content active">
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3>Total Posts</h3>
+                <p class="stat-number">24</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Likes</h3>
+                <p class="stat-number">1,250</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Comments</h3>
+                <p class="stat-number">387</p>
+            </div>
+            <div class="stat-card">
+                <h3>Subscribers</h3>
+                <p class="stat-number">542</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Manage Posts Tab -->
+    <section id="posts" class="tab-content">
+        <div class="posts-management">
+            <div class="posts-header">
+                <h2>Posts</h2>
+                <button id="addPostBtn" class="btn-primary">+ Add New Post</button>
+            </div>
+
+            <!-- Add/Edit Post Form -->
+            <form id="postForm" class="post-form" style="display: none;">
+                <div class="form-group">
+                    <label for="postTitle">Title:</label>
+                    <input type="text" id="postTitle" name="postTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="postCategory">Category:</label>
+                    <select id="postCategory" name="postCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="technology">Technology</option>
+                        <option value="lifestyle">Lifestyle</option>
+                        <option value="business">Business</option>
+                        <option value="health">Health</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="postContent">Content:</label>
+                    <textarea id="postContent" name="postContent" rows="8" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="postImage">Image URL:</label>
+                    <input type="url" id="postImage" name="postImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label for="postTags">Tags (comma-separated):</label>
+                    <input type="text" id="postTags" name="postTags" placeholder="tag1, tag2, tag3">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Post</button>
+                    <button type="button" id="cancelPostBtn" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+
+            <!-- Posts Table -->
+            <table id="postsTable" class="posts-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Likes</th>
+                        <th>Comments</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="postsTableBody">
+                    <!-- Posts will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Manage Comments Tab -->
+    <section id="comments" class="tab-content">
+        <div class="comments-management">
+            <h2>Comments</h2>
+            <table id="commentsTable" class="comments-table">
+                <thead>
+                    <tr>
+                        <th>Author</th>
+                        <th>Comment</th>
+                        <th>Post</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="commentsTableBody">
+                    <!-- Comments will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Subscriptions Tab -->
+    <section id="subscriptions" class="tab-content">
+        <div class="subscriptions-management">
+            <h2>Subscribers</h2>
+            <div class="subscriptions-stats">
+                <p>Total Subscribers: <strong id="totalSubscribers">542</strong></p>
+            </div>
+            <table id="subscribersTable" class="subscribers-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Subscribed Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="subscribersTableBody">
+                    <!-- Subscribers will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<div id="adminMessage" class="admin-message"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,99 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.venv
+myvenv/
+.env
+.venv.local
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+/static
+.webassets-cache
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.sublime-project
+.sublime-workspace
+*.code-workspace
+.env.local
+
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Misc
+.env.*.local
+*.pem
+*.key
+.cache/
+
+# Project Specific
+media/
+uploads/
+*.backup
+*.bak
+.env.production
+.env.staging
+
+# Node modules (if using any npm packages)
+node_modules/
+package-lock.json
+
+# Dependencies lock files
+Pipfile.lock
+poetry.lock
+
+# Mac
+.DS_Store
+._*
+
+# Windows
+*.lnk

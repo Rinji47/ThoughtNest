@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile - ThoughtNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="avatar-wrapper">
+                <img src="{% static 'images/profile-avatar.jpg' %}" alt="Profile picture" class="profile-avatar" onerror="this.src=''; this.onerror=null;">
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-name">John Doe</h1>
+                <p class="profile-email">john@example.com</p>
+                <p class="profile-bio">Web developer, tech enthusiast, and lifelong learner. Passionate about building beautiful and functional web experiences.</p>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label">Posts</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">284</span>
+                        <span class="stat-label">Total Likes</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">64</span>
+                        <span class="stat-label">Comments</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="profile-tabs">
+            <button class="tab-btn active" data-tab="my-posts">My Posts</button>
+            <button class="tab-btn" data-tab="subscriptions">Subscriptions</button>
+            <button class="tab-btn" data-tab="liked-posts">Liked Posts</button>
+            <button class="tab-btn" data-tab="settings">Settings</button>
+        </div>
+
+        <!-- My Posts Tab -->
+        <div class="tab-content active" id="my-posts">
+            <h2 class="tab-title">My Published Posts</h2>
+            <div class="posts-list">
+                <article class="post-item">
+                    <div class="post-item-header">
+                        <h3><a href="/posts/1/">Getting Started with Web Development</a></h3>
+                        <span class="post-status">Published</span>
+                    </div>
+                    <p class="post-item-meta">
+                        Published: Jan 15, 2025 | 
+                        <span class="post-item-likes">24 likes</span> | 
+                        <span class="post-item-comments">8 comments</span>
+                    </p>
+                    <div class="post-item-actions">
+                        <a href="/posts/1/" class="btn-secondary">View</a>
+                        <a href="/admin/post/1/edit" class="btn-secondary">Edit</a>
+                        <button class="btn-delete">Delete</button>
+                    </div>
+                </article>
+
+                <article class="post-item">
+                    <div class="post-item-header">
+                        <h3><a href="/posts/5/">Understanding APIs</a></h3>
+                        <span class="post-status">Published</span>
+                    </div>
+                    <p class="post-item-meta">
+                        Published: Jan 14, 2025 | 
+                        <span class="post-item-likes">18 likes</span> | 
+                        <span class="post-item-comments">5 comments</span>
+                    </p>
+                    <div class="post-item-actions">
+                        <a href="/posts/5/" class="btn-secondary">View</a>
+                        <a href="/admin/post/5/edit" class="btn-secondary">Edit</a>
+                        <button class="btn-delete">Delete</button>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <!-- Subscriptions Tab -->
+        <div class="tab-content" id="subscriptions">
+            <h2 class="tab-title">My Email Subscriptions</h2>
+            <p class="subscription-info">You are subscribed to our newsletter. You will receive updates on new posts.</p>
+            <div class="subscription-settings">
+                <label class="checkbox">
+                    <input type="checkbox" checked>
+                    <span>Notify me on new posts</span>
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox">
+                    <span>Weekly digest</span>
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox">
+                    <span>New from my favorite categories</span>
+                </label>
+            </div>
+            <button class="btn-primary">Save Preferences</button>
+        </div>
+
+        <!-- Liked Posts Tab -->
+        <div class="tab-content" id="liked-posts">
+            <h2 class="tab-title">Posts I've Liked</h2>
+            <div class="liked-posts-grid">
+                <article class="liked-post">
+                    <div class="image-wrapper">
+                        <img src="{% static 'images/post2.jpg' %}" alt="Post" class="liked-post-image" onerror="this.src=''; this.onerror=null;">
+                    </div>
+                    <h3><a href="/posts/2/">Modern UI Design Principles</a></h3>
+                    <p class="liked-post-author">By Sarah Smith</p>
+                </article>
+
+                <article class="liked-post">
+                    <div class="image-wrapper">
+                        <img src="{% static 'images/post3.jpg' %}" alt="Post" class="liked-post-image" onerror="this.src=''; this.onerror=null;">
+                    </div>
+                    <h3><a href="/posts/3/">Work-Life Balance Tips</a></h3>
+                    <p class="liked-post-author">By Emma Johnson</p>
+                </article>
+
+                <article class="liked-post">
+                    <div class="image-wrapper">
+                        <img src="{% static 'images/post4.jpg' %}" alt="Post" class="liked-post-image" onerror="this.src=''; this.onerror=null;">
+                    </div>
+                    <h3><a href="/posts/4/">Advanced JavaScript Concepts</a></h3>
+                    <p class="liked-post-author">By Mike Johnson</p>
+                </article>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings">
+            <h2 class="tab-title">Account Settings</h2>
+            <form class="settings-form" id="settingsForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" value="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" value="john@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" rows="4">Web developer, tech enthusiast, and lifelong learner.</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Change Password</label>
+                    <input type="password" id="password" placeholder="Enter new password">
+                    <small>Leave blank to keep current password</small>
+                </div>
+
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}
