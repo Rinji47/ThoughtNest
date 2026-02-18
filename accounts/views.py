@@ -60,7 +60,21 @@ def user_logout(request):
 
 
 def home(request):
-	return render(request, 'pages/home.html')
+	from posts.models import Post, Category
+	from django.db.models import Count
+	
+	# Get published posts with related data
+	latest_posts = Post.objects.filter(status=Post.STATUS_PUBLISHED).select_related('author', 'category').prefetch_related('comments', 'likes').order_by('-created_at')[:12]
+	
+	# Get all categories with post counts
+	categories = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:5]
+	
+	context = {
+		'latest_posts': latest_posts,
+		'categories': categories,
+		'total_posts': Post.objects.filter(status=Post.STATUS_PUBLISHED).count(),
+	}
+	return render(request, 'pages/home.html', context)
 
 
 @login_required

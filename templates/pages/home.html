@@ -26,72 +26,45 @@
             <input type="text" id="searchInput" class="search-box" placeholder="Search posts by title or keyword...">
             <select id="categoryFilter" class="filter-select">
                 <option value="">All Categories</option>
-                <option value="technology">Technology</option>
-                <option value="design">Design</option>
-                <option value="lifestyle">Lifestyle</option>
-                <option value="business">Business</option>
+                {% for category in categories %}
+                <option value="{{ category.slug }}">{{ category.name }}</option>
+                {% endfor %}
             </select>
         </div>
 
         <!-- Posts Grid -->
         <div class="posts-grid" id="postsContainer">
-            <!-- Posts loaded by JavaScript -->
-            <article class="post-card">
-                <div class="image-wrapper">
-                    <img src="{% static 'images/post1.jpg' %}" alt="Post" class="post-image" onerror="this.src=''; this.onerror=null;">
-                </div>
-                <div class="post-content">
-                    <span class="post-category">Technology</span>
-                    <h3 class="post-title">Getting Started with Web Development</h3>
-                    <p class="post-excerpt">Learn the fundamentals of HTML, CSS, and JavaScript to begin your web development journey...</p>
-                    <div class="post-meta">
-                        <span>By John Doe</span>
-                        <span>Jan 15, 2025</span>
+            {% if latest_posts %}
+                {% for post in latest_posts %}
+                <article class="post-card">
+                    {% if post.featured_image %}
+                    <div class="image-wrapper">
+                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="post-image">
                     </div>
-                    <div class="post-footer">
-                        <span class="post-likes" data-id="1"><i class="fa-solid fa-heart"></i> 24 likes</span>
-                        <a href="/posts/1/" class="read-more">Read More →</a>
+                    {% endif %}
+                    <div class="post-content">
+                        {% if post.category %}
+                        <span class="post-category">{{ post.category.name }}</span>
+                        {% endif %}
+                        <h3 class="post-title">{{ post.title }}</h3>
+                        <p class="post-excerpt">{{ post.content|truncatewords:30 }}</p>
+                        <div class="post-meta">
+                            <span>By {{ post.author.get_full_name|default:post.author.username }}</span>
+                            <span>{{ post.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="post-footer">
+                            <span class="post-likes" data-id="{{ post.pk }}"><i class="fa-solid fa-heart"></i> {{ post.likes.count }} likes</span>
+                            <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More →</a>
+                        </div>
                     </div>
-                </div>
-            </article>
-
-            <article class="post-card">
-                <div class="image-wrapper">
-                    <img src="{% static 'images/post2.jpg' %}" alt="Post" class="post-image" onerror="this.src=''; this.onerror=null;">
-                </div>
-                <div class="post-content">
-                    <span class="post-category">Design</span>
-                    <h3 class="post-title">Modern UI Design Principles</h3>
-                    <p class="post-excerpt">Explore the latest design trends and best practices for creating user-friendly interfaces...</p>
-                    <div class="post-meta">
-                        <span>By Sarah Smith</span>
-                        <span>Jan 12, 2025</span>
-                    </div>
-                    <div class="post-footer">
-                        <span class="post-likes" data-id="2"><i class="fa-solid fa-heart"></i> 18 likes</span>
-                        <a href="/posts/2/" class="read-more">Read More →</a>
-                    </div>
-                </div>
-            </article>
-
-            <article class="post-card">
-                <div class="image-wrapper">
-                    <img src="{% static 'images/post3.jpg' %}" alt="Post" class="post-image" onerror="this.src=''; this.onerror=null;">
-                </div>
-                <div class="post-content">
-                    <span class="post-category">Lifestyle</span>
-                    <h3 class="post-title">Work-Life Balance Tips</h3>
-                    <p class="post-excerpt">Practical strategies to maintain a healthy balance between your career and personal life...</p>
-                    <div class="post-meta">
-                        <span>By Emma Johnson</span>
-                        <span>Jan 10, 2025</span>
-                    </div>
-                    <div class="post-footer">
-                        <span class="post-likes" data-id="3"><i class="fa-solid fa-heart"></i> 32 likes</span>
-                        <a href="/posts/3/" class="read-more">Read More →</a>
-                    </div>
-                </div>
-            </article>
+                </article>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                <i class="fa-solid fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem; display: block;"></i>
+                <p style="color: #666; font-size: 1.1rem;">No posts yet. Check back soon!</p>
+            </div>
+            {% endif %}
         </div>
 
         <div id="noResults" class="no-results" style="display: none;">

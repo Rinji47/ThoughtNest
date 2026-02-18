@@ -12,6 +12,7 @@ def categories(request):
 	for cat in categories_list:
 		cat.recent_posts = cat.posts.filter(status=Post.STATUS_PUBLISHED).select_related('author').order_by('-created_at')[:2]
 	tags = Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')
+	
 
 	context = {'categories': categories_list, 'tags': tags}
 	return render(request, 'pages/categories.html', context)
@@ -57,6 +58,7 @@ def post_create(request):
 		# Handle tags
 		if tags_input:
 			tag_names = [tag.strip() for tag in tags_input.split(',')]
+			tag_names = [tag.lstrip("#") for tag in tag_names]
 			for tag_name in tag_names:
 				if tag_name:
 					tag, _ = Tag.objects.get_or_create(name=tag_name)
@@ -146,8 +148,7 @@ def post_toggle_like(request, pk):
 
 @login_required
 def user_manage_posts(request):
-
-	posts = Post.objects.filter(author=request.user).select_related('category').prefetch_related('comments', 'likes').order_by('-created_at')
+	posts = Post.objects.filter(author=request.user).select_related('category').prefetch_related('comments', 'likes', 'tags').order_by('-created_at')
 	context = {'posts': posts}
 	return render(request, 'posts/user_posts.html', context)
 
