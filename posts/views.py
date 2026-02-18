@@ -19,12 +19,15 @@ def categories(request):
 
 
 def post_detail(request, pk):
-	post = get_object_or_404(Post, pk=pk)
+	post = get_object_or_404(Post.objects.prefetch_related('tags'), pk=pk)
 	comments = post.comments.filter(approved=True).select_related('author')
+	user_has_liked = False
+	if request.user.is_authenticated:
+		user_has_liked = Like.objects.filter(post=post, user=request.user).exists()
 	return render(
 		request,
 		'posts/post_detail.html',
-		{'post': post, 'comments': comments},
+		{'post': post, 'comments': comments, 'user_has_liked': user_has_liked},
 	)
 
 
@@ -144,6 +147,9 @@ def post_toggle_like(request, pk):
 		Like.objects.create(post=post, user=request.user)
 		messages.success(request, 'You liked the post.')
 
+	next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+	if next_url:
+		return redirect(next_url)
 	return redirect('post_detail', pk=post.pk)
 
 @login_required

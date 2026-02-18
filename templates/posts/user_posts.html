@@ -134,6 +134,32 @@
         color: #856404;
     }
 
+    .post-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+        margin-bottom: 1rem;
+    }
+
+    .tag-link {
+        display: inline-block;
+        background: #f0f0f0;
+        color: #A0845B;
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        transition: all 0.3s ease;
+    }
+
+    .tag-link:hover {
+        background: #A0845B;
+        color: white;
+        border-color: #A0845B;
+    }
+
     .post-item-excerpt {
         color: #6c757d;
         margin-bottom: 1rem;
@@ -280,6 +306,14 @@
                         {{ post.get_status_display }}
                     </span>
                 </div>
+
+                {% if post.tags.all %}
+                <div class="post-tags">
+                    {% for tag in post.tags.all %}
+                    <a href="{% url 'categories' %}?tag={{ tag.slug }}" class="tag-link">#{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
                 <p class="post-item-excerpt">
                     {{ post.content|truncatewords:30 }}

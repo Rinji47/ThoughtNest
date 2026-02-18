@@ -60,7 +60,7 @@ def user_logout(request):
 
 
 def home(request):
-	from posts.models import Post, Category
+	from posts.models import Post, Category, Like
 	from django.db.models import Count
 	
 	# Get published posts with related data
@@ -68,6 +68,15 @@ def home(request):
 	
 	# Get all categories with post counts
 	categories = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:5]
+	
+	# Check which posts the user has liked
+	user_liked_posts = set()
+	if request.user.is_authenticated:
+		user_liked_posts = set(Like.objects.filter(user=request.user, post__in=latest_posts).values_list('post_id', flat=True))
+	
+	# Add user_has_liked attribute to each post
+	for post in latest_posts:
+		post.user_has_liked = post.id in user_liked_posts
 	
 	context = {
 		'latest_posts': latest_posts,
@@ -118,4 +127,4 @@ def profile(request):
 		'user_like_count': user_like_count,
 		'user_comment_count': user_comment_count,
 	}
-	return render(request, 'pages/profile.html', context)
+	return render(request, 'users/profile.html', context)

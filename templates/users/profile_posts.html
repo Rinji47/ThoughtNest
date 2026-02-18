@@ -1,0 +1,49 @@
+<!-- My Posts Section -->
+<section id="posts" class="section-container profile-section">
+    <h2 class="section-subtitle">My Posts</h2>
+    
+    {% if user_posts %}
+        <div class="posts-grid">
+            {% for post in user_posts %}
+                <div class="post-item">
+                    <div class="post-header">
+                        <div style="flex: 1;">
+                            <h3 class="post-title">
+                                <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                            </h3>
+                            <div class="post-meta">
+                                <span>{{ post.created_at|date:"M d, Y" }}</span>
+                                <span>{{ post.category.name }}</span>
+                                <span class="post-status {{ post.get_status_display|lower }}">
+                                     {{ post.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if post.content %}
+                        <div class="post-excerpt">
+                            {{ post.content|truncatewords:30 }}
+                        </div>
+                    {% endif %}
+                    <div class="post-actions">
+                        <a href="{% url 'edit_post' post.pk %}" class="post-action-btn btn-edit">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </a>
+                        <form method="post" action="{% url 'post_delete' post.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                            {% csrf_token %}
+                            <button type="submit" class="post-action-btn btn-delete">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="posts-empty">
+            <i class="fa-solid fa-file-circle-question"></i>
+            <p>You haven't made any posts yet.</p>
+            <a href="{% url 'post_create' %}">Create your first post →</a>
+        </div>
+    {% endif %}
+</section>

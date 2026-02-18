@@ -53,7 +53,19 @@
                             <span>{{ post.created_at|date:"M d, Y" }}</span>
                         </div>
                         <div class="post-footer">
-                            <span class="post-likes" data-id="{{ post.pk }}"><i class="fa-solid fa-heart"></i> {{ post.likes.count }} likes</span>
+                            {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'post_toggle_like' post.pk %}" class="post-like-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                <button type="submit" class="post-likes-btn {% if post.user_has_liked %}liked{% endif %}" data-id="{{ post.pk }}">
+                                    <i class="fa-solid fa-heart"></i> {{ post.likes.count }} likes
+                                </button>
+                            </form>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="post-likes-btn">
+                                <i class="fa-solid fa-heart"></i> {{ post.likes.count }} likes
+                            </a>
+                            {% endif %}
                             <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More →</a>
                         </div>
                     </div>
