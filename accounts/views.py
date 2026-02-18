@@ -69,11 +69,9 @@ def admin_dashboard(request):
 		messages.error(request, 'You do not have permission to access the admin dashboard.')
 		return redirect('home')
 
+	from posts.models import Comment, Like, Post
 	posts = Post.objects.select_related('author', 'category').prefetch_related('comments', 'likes')
-	categories = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')
 	context = {
-		'posts': posts,
-		'categories': categories,
 		'total_posts': posts.count(),
 		'total_comments': Comment.objects.count(),
 		'total_likes': Like.objects.count(),
@@ -94,42 +92,16 @@ def admin_page(request):
 
 
 @login_required
-def admin_create_category(request):
-	if not request.user.is_staff:
-		messages.error(request, 'You do not have permission to perform this action.')
-		return redirect('home')
-	
-	if request.method == 'POST':
-		name = request.POST.get('name', '').strip()
-		if not name:
-			messages.error(request, 'Category name is required.')
-		else:
-			try:
-				Category.objects.create(name=name)
-				messages.success(request, f'Category "{name}" created successfully!')
-			except Exception as e:
-				messages.error(request, f'Error creating category: {str(e)}')
-	
-	return redirect('admin_dashboard')
-
-
-@login_required
-def admin_delete_category(request, pk):
-	if not request.user.is_staff:
-		messages.error(request, 'You do not have permission to perform this action.')
-		return redirect('home')
-	
-	if request.method == 'POST':
-		try:
-			category = Category.objects.get(pk=pk)
-			category_name = category.name
-			category.delete()
-			messages.success(request, f'Category "{category_name}" deleted successfully!')
-		except Category.DoesNotExist:
-			messages.error(request, 'Category not found.')
-		except Exception as e:
-			messages.error(request, f'Error deleting category: {str(e)}')
-	
-	return redirect('admin_dashboard')
 def profile(request):
-	return render(request, 'pages/profile.html')
+	user_posts = Post.objects.filter(author=request.user).order_by('-created_at')
+	user_post_count = user_posts.count()
+	user_like_count = Like.objects.filter(user=request.user).count()
+	user_comment_count = Comment.objects.filter(author=request.user).count()
+	
+	context = {
+		'user_posts': user_posts,
+		'user_post_count': user_post_count,
+		'user_like_count': user_like_count,
+		'user_comment_count': user_comment_count,
+	}
+	return render(request, 'pages/profile.html', context)

@@ -9,7 +9,5 @@ urlpatterns = [
 	path('logout/', views.user_logout, name='logout'),
 	path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 	path('admin-page/', views.admin_page, name='admin_page'),
-	path('admin/category/create/', views.admin_create_category, name='admin_create_category'),
-	path('admin/category/<int:pk>/delete/', views.admin_delete_category, name='admin_delete_category'),
 	path('profile/', views.profile, name='profile'),
 ]

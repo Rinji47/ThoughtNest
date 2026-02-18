@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Removed Django built-in admin - using custom admin dashboard instead
     path('', include('accounts.urls')),
     path('', include('posts.urls')),
 ]

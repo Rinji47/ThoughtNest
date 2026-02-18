@@ -1,172 +1,546 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}My Profile - ThoughtNest{% endblock %}
+{% block title %}{{ user.username }} - ThoughtNest{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #f5f3f0;
+    }
+
+    .profile-wrapper {
+        display: flex;
+        min-height: calc(100vh - 100px);
+        gap: 0;
+        margin-top: 0;
+        padding: 0;
+    }
+
+    .profile-sidebar {
+        width: 280px;
+        background: linear-gradient(180deg, #8B6F47 0%, #A0845B 100%);
+        padding: 2rem 0;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        position: fixed;
+        left: 0;
+        top: 70px;
+        height: calc(100vh - 70px);
+        overflow-y: auto;
+        z-index: 100;
+    }
+
+    .profile-header-section {
+        padding: 2rem 1.5rem;
+        border-bottom: 2px solid rgba(255,255,255,0.2);
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    .profile-name {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .profile-email {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .profile-stats-section {
+        padding: 1.5rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        margin: 1.2rem 0;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #A0845B;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    .profile-nav {
+        padding: 1rem 0;
+    }
+
+    .profile-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .profile-nav li {
+        margin: 0;
+    }
+
+    .profile-nav-link {
+        display: block;
+        padding: 1rem 1.5rem;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+        font-weight: 500;
+    }
+
+    .profile-nav-link:hover {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border-left-color: #FFD700;
+    }
+
+    .profile-nav-link.active {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border-left-color: #FFD700;
+        font-weight: 600;
+    }
+
+    .profile-section {
+        display: none;
+    }
+
+    .profile-section.active {
+        display: block;
+    }
+
+    .profile-content {
+        margin-left: 280px;
+        flex: 1;
+        padding: 2.5rem 3rem;
+        width: calc(100% - 280px);
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 2rem 0;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #E9ECEF;
+    }
+
+    .section-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 2.5rem;
+    }
+
+    .section-subtitle {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #333;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #E9ECEF;
+    }
+
+    .posts-empty {
+        text-align: center;
+        padding: 2rem;
+        color: #999;
+    }
+
+    .posts-empty i {
+        font-size: 3rem;
+        color: #ddd;
+        display: block;
+        margin-bottom: 1rem;
+    }
+
+    .posts-empty p {
+        font-size: 1.05rem;
+        margin: 1rem 0 0 0;
+    }
+
+    .posts-empty a {
+        color: #A0845B;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        display: inline-block;
+    }
+
+    .posts-empty a:hover {
+        color: #8B6F47;
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .post-item {
+        background: #f9f9f9;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .post-item:hover {
+        background: #ffffff;
+        border-color: #A0845B;
+        box-shadow: 0 4px 12px rgba(160, 132, 91, 0.15);
+    }
+
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .post-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .post-title a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .post-title a:hover {
+        color: #A0845B;
+    }
+
+    .post-meta {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.875rem;
+        color: #999;
+        margin: 0.5rem 0 1rem 0;
+        flex-wrap: wrap;
+    }
+
+    .post-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .post-status.published {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .post-status.draft {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .post-excerpt {
+        color: #666;
+        line-height: 1.6;
+        margin: 1rem 0;
+    }
+
+    .post-actions {
+        display: flex;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .post-action-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-edit {
+        background: #A0845B;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #8B6F47;
+        box-shadow: 0 2px 8px rgba(160, 132, 91, 0.3);
+    }
+
+    .btn-delete {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c0392b;
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    }
+
+    .settings-box {
+        background: #f9f9f9;
+        border-left: 4px solid #A0845B;
+        padding: 1.5rem;
+        border-radius: 6px;
+        color: #666;
+    }
+
+    .settings-box p {
+        margin: 0;
+        font-size: 1.05rem;
+    }
+
+    @media (max-width: 1024px) {
+        .profile-sidebar {
+            width: 260px;
+        }
+        .profile-content {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            padding: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-wrapper {
+            flex-direction: column;
+        }
+        .profile-sidebar {
+            position: relative;
+            top: 0;
+            width: 100%;
+            height: auto;
+            padding: 1rem 0;
+        }
+        .profile-content {
+            margin-left: 0;
+            width: 100%;
+            padding: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+        }
+        .post-header {
+            flex-direction: column;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="profile-container">
-        <!-- Profile Header -->
-        <div class="profile-header">
-            <div class="avatar-wrapper">
-                <img src="{% static 'images/profile-avatar.jpg' %}" alt="Profile picture" class="profile-avatar" onerror="this.src=''; this.onerror=null;">
+<div class="profile-wrapper">
+    <aside class="profile-sidebar">
+        <div class="profile-header-section">
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user"></i>
             </div>
-            <div class="profile-info">
-                <h1 class="profile-name">John Doe</h1>
-                <p class="profile-email">john@example.com</p>
-                <p class="profile-bio">Web developer, tech enthusiast, and lifelong learner. Passionate about building beautiful and functional web experiences.</p>
-                <div class="profile-stats">
-                    <div class="stat">
-                        <span class="stat-number">12</span>
-                        <span class="stat-label">Posts</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">284</span>
-                        <span class="stat-label">Total Likes</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">64</span>
-                        <span class="stat-label">Comments</span>
-                    </div>
-                </div>
+            <h2 class="profile-name">{{ user.get_full_name|default:user.username }}</h2>
+            <p class="profile-email">{{ user.email }}</p>
+        </div>
+
+        <div class="profile-stats-section" style="display: none;">
+            <div class="stat-item">
+                <span class="stat-number">{{ user_post_count }}</span>
+                <span class="stat-label">Posts</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ user_like_count }}</span>
+                <span class="stat-label">Likes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ user_comment_count }}</span>
+                <span class="stat-label">Comments</span>
             </div>
         </div>
 
-        <!-- Tabs Navigation -->
-        <div class="profile-tabs">
-            <button class="tab-btn active" data-tab="my-posts">My Posts</button>
-            <button class="tab-btn" data-tab="subscriptions">Subscriptions</button>
-            <button class="tab-btn" data-tab="liked-posts">Liked Posts</button>
-            <button class="tab-btn" data-tab="settings">Settings</button>
-        </div>
+        <nav class="profile-nav">
+            <ul>
+                <li><a href="#overview" class="profile-nav-link section-link" data-section="overview">Overview</a></li>
+                <li><a href="#posts" class="profile-nav-link section-link" data-section="posts">My Posts</a></li>
+                <li><a href="#settings" class="profile-nav-link section-link" data-section="settings">Settings</a></li>
+            </ul>
+        </nav>
+    </aside>
 
-        <!-- My Posts Tab -->
-        <div class="tab-content active" id="my-posts">
-            <h2 class="tab-title">My Published Posts</h2>
-            <div class="posts-list">
-                <article class="post-item">
-                    <div class="post-item-header">
-                        <h3><a href="/posts/1/">Getting Started with Web Development</a></h3>
-                        <span class="post-status">Published</span>
-                    </div>
-                    <p class="post-item-meta">
-                        Published: Jan 15, 2025 | 
-                        <span class="post-item-likes">24 likes</span> | 
-                        <span class="post-item-comments">8 comments</span>
-                    </p>
-                    <div class="post-item-actions">
-                        <a href="/posts/1/" class="btn-secondary">View</a>
-                        <a href="/admin/post/1/edit" class="btn-secondary">Edit</a>
-                        <button class="btn-delete">Delete</button>
-                    </div>
-                </article>
+    <main class="profile-content">
+        <h1 class="section-title">My Profile</h1>
 
-                <article class="post-item">
-                    <div class="post-item-header">
-                        <h3><a href="/posts/5/">Understanding APIs</a></h3>
-                        <span class="post-status">Published</span>
-                    </div>
-                    <p class="post-item-meta">
-                        Published: Jan 14, 2025 | 
-                        <span class="post-item-likes">18 likes</span> | 
-                        <span class="post-item-comments">5 comments</span>
-                    </p>
-                    <div class="post-item-actions">
-                        <a href="/posts/5/" class="btn-secondary">View</a>
-                        <a href="/admin/post/5/edit" class="btn-secondary">Edit</a>
-                        <button class="btn-delete">Delete</button>
-                    </div>
-                </article>
+        <!-- Overview Section -->
+        <section id="overview" class="section-container profile-section active">
+            <h2 class="section-subtitle">Profile Overview</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                <div style="text-align: center; padding: 1.5rem; background: #f9f9f9; border-radius: 8px;">
+                    <div style="font-size: 2.5rem; color: #A0845B; font-weight: 700; margin-bottom: 0.5rem;">{{ user_post_count }}</div>
+                    <div style="color: #999; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Posts Published</div>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; background: #f9f9f9; border-radius: 8px;">
+                    <div style="font-size: 2.5rem; color: #A0845B; font-weight: 700; margin-bottom: 0.5rem;">{{ user_like_count }}</div>
+                    <div style="color: #999; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Likes Received</div>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; background: #f9f9f9; border-radius: 8px;">
+                    <div style="font-size: 2.5rem; color: #A0845B; font-weight: 700; margin-bottom: 0.5rem;">{{ user_comment_count }}</div>
+                    <div style="color: #999; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Comments</div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Subscriptions Tab -->
-        <div class="tab-content" id="subscriptions">
-            <h2 class="tab-title">My Email Subscriptions</h2>
-            <p class="subscription-info">You are subscribed to our newsletter. You will receive updates on new posts.</p>
-            <div class="subscription-settings">
-                <label class="checkbox">
-                    <input type="checkbox" checked>
-                    <span>Notify me on new posts</span>
-                </label>
-                <label class="checkbox">
-                    <input type="checkbox">
-                    <span>Weekly digest</span>
-                </label>
-                <label class="checkbox">
-                    <input type="checkbox">
-                    <span>New from my favorite categories</span>
-                </label>
+        <!-- My Posts Section -->
+        <section id="posts" class="section-container profile-section">
+            <h2 class="section-subtitle">My Published Posts</h2>
+            
+            {% if user_posts %}
+                <div class="posts-grid">
+                    {% for post in user_posts %}
+                        <div class="post-item">
+                            <div class="post-header">
+                                <div style="flex: 1;">
+                                    <h3 class="post-title">
+                                        <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                                    </h3>
+                                    <div class="post-meta">
+                                        <span>{{ post.created_at|date:"M d, Y" }}</span>
+                                        <span>{{ post.category.name }}</span>
+                                        <span class="post-status {% if post.is_published %}published{% else %}draft{% endif %}">
+                                            {% if post.is_published %}Published{% else %}Draft{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if post.content %}
+                                <div class="post-excerpt">
+                                    {{ post.content|truncatewords:30 }}
+                                </div>
+                            {% endif %}
+                            <div class="post-actions">
+                                <a href="{% url 'edit_post' post.pk %}" class="post-action-btn btn-edit">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </a>
+                                <form method="post" action="{% url 'post_delete' post.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="post-action-btn btn-delete">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="posts-empty">
+                    <i class="fa-solid fa-file-circle-question"></i>
+                    <p>You haven't published any posts yet.</p>
+                    <a href="{% url 'post_create' %}">Create your first post →</a>
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Account Settings Section -->
+        <section id="settings" class="section-container profile-section">
+            <h2 class="section-subtitle">Account Settings</h2>
+            <div class="settings-box">
+                <h3 style="margin-top: 0; color: #333; font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-user-circle"></i> Profile Information</h3>
+                <dl style="margin-bottom: 2rem;">
+                    <dt style="font-weight: 700; color: #666; font-size: 0.9rem; margin-top: 1rem; margin-bottom: 0.25rem;">Full Name</dt>
+                    <dd style="margin: 0 0 1rem 0; color: #333;">{{ user.get_full_name|default:"Not set" }}</dd>
+                    
+                    <dt style="font-weight: 700; color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">Email</dt>
+                    <dd style="margin: 0 0 1rem 0; color: #333;">{{ user.email }}</dd>
+                    
+                    <dt style="font-weight: 700; color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">Username</dt>
+                    <dd style="margin: 0; color: #333;">{{ user.username }}</dd>
+                </dl>
+                <a href="#" style="color: #A0845B; text-decoration: none; font-weight: 600; display: inline-block; margin-top: 1rem;">Edit Profile →</a>
             </div>
-            <button class="btn-primary">Save Preferences</button>
-        </div>
 
-        <!-- Liked Posts Tab -->
-        <div class="tab-content" id="liked-posts">
-            <h2 class="tab-title">Posts I've Liked</h2>
-            <div class="liked-posts-grid">
-                <article class="liked-post">
-                    <div class="image-wrapper">
-                        <img src="{% static 'images/post2.jpg' %}" alt="Post" class="liked-post-image" onerror="this.src=''; this.onerror=null;">
-                    </div>
-                    <h3><a href="/posts/2/">Modern UI Design Principles</a></h3>
-                    <p class="liked-post-author">By Sarah Smith</p>
-                </article>
-
-                <article class="liked-post">
-                    <div class="image-wrapper">
-                        <img src="{% static 'images/post3.jpg' %}" alt="Post" class="liked-post-image" onerror="this.src=''; this.onerror=null;">
-                    </div>
-                    <h3><a href="/posts/3/">Work-Life Balance Tips</a></h3>
-                    <p class="liked-post-author">By Emma Johnson</p>
-                </article>
-
-                <article class="liked-post">
-                    <div class="image-wrapper">
-                        <img src="{% static 'images/post4.jpg' %}" alt="Post" class="liked-post-image" onerror="this.src=''; this.onerror=null;">
-                    </div>
-                    <h3><a href="/posts/4/">Advanced JavaScript Concepts</a></h3>
-                    <p class="liked-post-author">By Mike Johnson</p>
-                </article>
+            <div class="settings-box" style="margin-top: 1.5rem;">
+                <h3 style="margin-top: 0; color: #333; font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-lock"></i> Security</h3>
+                <p style="color: #666; margin: 0 0 1rem 0;">Manage your password and security settings.</p>
+                <a href="#" style="color: #A0845B; text-decoration: none; font-weight: 600; display: inline-block;">Change Password →</a>
             </div>
-        </div>
 
-        <!-- Settings Tab -->
-        <div class="tab-content" id="settings">
-            <h2 class="tab-title">Account Settings</h2>
-            <form class="settings-form" id="settingsForm">
-                <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" value="John Doe" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" value="john@example.com" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="bio">Bio</label>
-                    <textarea id="bio" rows="4">Web developer, tech enthusiast, and lifelong learner.</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Change Password</label>
-                    <input type="password" id="password" placeholder="Enter new password">
-                    <small>Leave blank to keep current password</small>
-                </div>
-
-                <button type="submit" class="btn-primary">Save Changes</button>
-            </form>
-        </div>
-    </div>
+            <div class="settings-box" style="margin-top: 1.5rem; background: #fff3cd; border-left-color: #ffc107;">
+                <h3 style="margin-top: 0; color: #856404; font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-gear"></i> Preferences</h3>
+                <p style="color: #856404; margin: 0;">Additional customization options coming soon.</p>
+            </div>
+        </section>
+    </main>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/profile.js' %}"></script>
+<script>
+document.querySelectorAll('.section-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = this.getAttribute('data-section');
+        
+        // Remove active class from all sections and links
+        document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.section-link').forEach(l => l.classList.remove('active'));
+        
+        // Add active class to clicked link
+        this.classList.add('active');
+        
+        // Show the corresponding section
+        const sectionEl = document.getElementById(section);
+        if (sectionEl) {
+            sectionEl.classList.add('active');
+            sectionEl.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+// Set overview as active on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const overviewLink = document.querySelector('[data-section="overview"]');
+    if (overviewLink) {
+        overviewLink.click();
+    }
+});
+</script>
 {% endblock %}

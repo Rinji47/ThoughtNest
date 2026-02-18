@@ -69,6 +69,8 @@ def post_create(request):
 		'mode': 'create',
 		'categories': Category.objects.all(),
 		'tags': Tag.objects.all(),
+		'popular_tags': Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')[:10],
+		'all_tag_names': list(Tag.objects.order_by('name').values_list('name', flat=True)),
 	}
 	return render(request, 'posts/post_form.html', context)
 
@@ -108,6 +110,8 @@ def post_edit(request, pk):
 		'post': post,
 		'categories': Category.objects.all(),
 		'tags': Tag.objects.all(),
+		'popular_tags': Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')[:10],
+		'all_tag_names': list(Tag.objects.order_by('name').values_list('name', flat=True)),
 	}
 	return render(request, 'posts/post_form.html', context)
 
@@ -139,3 +143,128 @@ def post_toggle_like(request, pk):
 		messages.success(request, 'You liked the post.')
 
 	return redirect('post_detail', pk=post.pk)
+
+
+# ========== ADMIN VIEWS ==========
+
+@login_required
+def admin_posts(request):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	posts = Post.objects.select_related('author', 'category').prefetch_related('comments', 'likes').order_by('-created_at')
+	context = {'posts': posts}
+	return render(request, 'admin/posts.html', context)
+
+
+@login_required
+def admin_comments(request):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	comments = Comment.objects.select_related('author', 'post').order_by('-created_at')
+	context = {'comments': comments}
+	return render(request, 'admin/comments.html', context)
+
+
+@login_required
+def admin_subscribers(request):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	context = {}
+	return render(request, 'admin/subscribers.html', context)
+
+
+@login_required
+def admin_settings(request):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	context = {}
+	return render(request, 'admin/settings.html', context)
+
+
+@login_required
+def admin_categories(request):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	categories = Category.objects.annotate(post_count=Count('posts')).order_by('-created_at')
+	context = {'categories': categories}
+	return render(request, 'admin/categories.html', context)
+
+
+@login_required
+def create_category_page(request):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	if request.method == 'POST':
+		name = request.POST.get('name', '').strip()
+		if not name:
+			messages.error(request, 'Category name is required.')
+			return redirect('create_category_page')
+		
+		if Category.objects.filter(name=name).exists():
+			messages.error(request, 'Category with this name already exists.')
+			return redirect('create_category_page')
+		
+		Category.objects.create(name=name)
+		messages.success(request, 'Category created successfully!')
+		return redirect('admin_categories')
+	
+	return render(request, 'admin/create_category.html', {})
+
+
+@login_required
+@require_POST
+def admin_create_category(request):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	name = request.POST.get('name', '').strip()
+	if not name:
+		messages.error(request, 'Category name is required.')
+		return redirect('admin_categories')
+	
+	if Category.objects.filter(name=name).exists():
+		messages.error(request, 'Category with this name already exists.')
+		return redirect('admin_categories')
+	
+	Category.objects.create(name=name)
+	messages.success(request, 'Category created successfully!')
+	return redirect('admin_categories')
+
+
+@login_required
+@require_POST
+def admin_delete_category(request, pk):
+	if not request.user.is_staff:
+		messages.error(request, 'You do not have permission.')
+		return redirect('home')
+	
+	category = get_object_or_404(Category, pk=pk)
+	category.delete()
+	messages.success(request, 'Category deleted successfully!')
+	return redirect('admin_categories')
+
+
+@login_required
+@require_POST
+def admin_delete_post(request, pk):
+	post = get_object_or_404(Post, pk=pk)
+	if not (request.user.is_staff or request.user == post.author):
+		messages.error(request, 'You do not have permission to delete this post.')
+		return redirect('post_detail', pk=post.pk)
+	
+	post.delete()
+	messages.success(request, 'Post deleted successfully!')
+	return redirect('admin_posts' if request.user.is_staff else 'profile')

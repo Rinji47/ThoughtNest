@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile - ThoughtNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+<style>
+    .profile-wrapper {
+        display: flex;
+        gap: 30px;
+        margin-top: 20px;
+        margin-bottom: 40px;
+        padding: 0 20px;
+    }
+    .profile-sidebar {
+        width: 260px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, #A0845B 0%, #8B6F47 100%);
+        border-radius: 12px;
+        padding: 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 90px;
+    }
+    .profile-sidebar h3 {
+        margin: 0;
+        padding: 1.5rem;
+        font-size: 1.25rem;
+        color: white;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(255,255,255,0.2);
+    }
+    .profile-sidebar ul {
+        list-style: none;
+        padding: 0.5rem 0;
+        margin: 0;
+    }
+    .profile-sidebar li {
+        margin: 0;
+    }
+    .profile-sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 1rem 1.5rem;
+        text-decoration: none;
+        color: rgba(255,255,255,0.85);
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+    .profile-sidebar a:hover,
+    .profile-sidebar a.active {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border-left-color: #FFD700;
+        font-weight: 600;
+    }
+    .profile-content {
+        flex: 1;
+    }
+    .profile-header {
+        display: flex;
+        gap: 2rem;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+    .avatar-wrapper {
+        flex-shrink: 0;
+    }
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        background: #e9ecef;
+        object-fit: cover;
+    }
+    .profile-info {
+        flex: 1;
+    }
+    .profile-name {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        color: #333;
+        font-weight: 700;
+    }
+    .profile-email {
+        color: #999;
+        margin: 0 0 1.5rem 0;
+        font-size: 0.95rem;
+    }
+    .profile-stats {
+        display: flex;
+        gap: 2.5rem;
+    }
+    .stat {
+        display: flex;
+        flex-direction: column;
+    }
+    .stat-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #A0845B;
+    }
+    .stat-label {
+        font-size: 0.875rem;
+        color: #999;
+        margin-top: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .profile-content h2 {
+        margin: 0 0 1.5rem 0;
+        color: #333;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    .posts-list {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    .post-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    .post-item:hover {
+        background: #fafafa;
+    }
+    .post-item:last-child {
+        border-bottom: none;
+    }
+    .post-item h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        color: #333;
+    }
+    .post-item h3 a {
+        color: #A0845B;
+        text-decoration: none;
+    }
+    .post-item h3 a:hover {
+        text-decoration: underline;
+    }
+    .post-item-meta {
+        color: #999;
+        font-size: 0.875rem;
+        margin: 0 0 1rem 0;
+    }
+    .post-item-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    .post-item-actions a {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        background: #f0f0f0;
+        color: #333;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    .post-item-actions a:hover {
+        background: #A0845B;
+        color: white;
+    }
+    .post-item-actions button {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    .post-item-actions button:hover {
+        background: #c82333;
+    }
+    .post-item-actions form {
+        display: inline;
+    }
+    .settings-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .settings-box p {
+        color: #666;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+    <div class="profile-sidebar">
+        <h3>Profile</h3>
+        <ul>
+            <li><a href="#profile" class="profile-link active">Overview</a></li>
+            <li><a href="#posts" class="profile-link">My Posts</a></li>
+            <li><a href="#settings" class="profile-link">Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="profile-content">
+        <!-- Profile Overview -->
+        <div id="profile">
+            <div class="profile-header">
+                <div class="avatar-wrapper">
+                    <img src="{% static 'images/profile-avatar.jpg' %}" alt="Profile picture" class="profile-avatar" onerror="this.src=''; this.onerror=null;">
+                </div>
+                <div class="profile-info">
+                    <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
+                    <p class="profile-email">{{ user.email }}</p>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-number">{{ user_post_count }}</span>
+                            <span class="stat-label">Posts</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">{{ user_like_count }}</span>
+                            <span class="stat-label">Total Likes</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">{{ user_comment_count }}</span>
+                            <span class="stat-label">Comments</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Posts Section -->
+        <div id="posts" style="margin-top: 2rem;">
+            <h2>My Published Posts</h2>
+            <div class="posts-list">
+                {% for post in user_posts %}
+                <div class="post-item">
+                    <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                    <p class="post-item-meta">
+                        Published: {{ post.created_at|date:"M d, Y" }} | 
+                        {{ post.likes.count }} likes | 
+                        {{ post.comments.count }} comments
+                    </p>
+                    <div class="post-item-actions">
+                        <a href="{% url 'post_detail' post.pk %}">View</a>
+                        <a href="{% url 'post_edit' post.pk %}">Edit</a>
+                        <form method="post" action="{% url 'post_delete' post.pk %}" style="display: inline;" onsubmit="return confirm('Delete this post?');">
+                            {% csrf_token %}
+                            <button type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="post-item">
+                    <p>You haven't published any posts yet. <a href="{% url 'post_create' }}" style="color: #A0845B; font-weight: 600;">Create your first post</a>!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings" style="margin-top: 2rem;">
+            <h2>Account Settings</h2>
+            <div class="settings-box">
+                <p>Settings management coming soon.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

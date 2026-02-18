@@ -1,0 +1,29 @@
+{% load static %}
+
+<aside class="admin-sidebar">
+    <div class="sidebar-header">
+        <h2>Admin Menu</h2>
+    </div>
+    <nav class="sidebar-nav">
+        <ul>
+            <li><a href="{% url 'admin_dashboard' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-gauge"></i> Dashboard
+            </a></li>
+            <li><a href="{% url 'admin_posts' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_posts' %}active{% endif %}">
+                <i class="fa-solid fa-pen-nib"></i> Posts
+            </a></li>
+            <li><a href="{% url 'admin_comments' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_comments' %}active{% endif %}">
+                <i class="fa-solid fa-comment"></i> Comments
+            </a></li>
+            <li><a href="{% url 'admin_subscribers' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_subscribers' %}active{% endif %}">
+                <i class="fa-solid fa-envelope"></i> Subscribers
+            </a></li>
+            <li><a href="{% url 'admin_settings' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_settings' %}active{% endif %}">
+                <i class="fa-solid fa-gear"></i> Settings
+            </a></li>
+            <li><a href="{% url 'admin_categories' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_categories' %}active{% endif %}">
+                <i class="fa-solid fa-folder"></i> Categories
+            </a></li>
+        </ul>
+    </nav>
+</aside>
