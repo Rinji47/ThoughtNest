@@ -2,28 +2,28 @@
 <section id="settings" class="section-container profile-section">
     <h2 class="section-subtitle">Account Settings</h2>
     <div class="settings-box">
-        <h3 style="margin-top: 0; color: #333; font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-user-circle"></i> Profile Information</h3>
-        <dl style="margin-bottom: 2rem;">
-            <dt style="font-weight: 700; color: #666; font-size: 0.9rem; margin-top: 1rem; margin-bottom: 0.25rem;">Full Name</dt>
-            <dd style="margin: 0 0 1rem 0; color: #333;">{{ user.get_full_name|default:"Not set" }}</dd>
+        <h3 class="settings-box-title"><i class="fa-solid fa-user-circle"></i> Profile Information</h3>
+        <dl class="settings-dl">
+            <dt>Full Name</dt>
+            <dd>{{ user.get_full_name|default:"Not set" }}</dd>
             
-            <dt style="font-weight: 700; color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">Email</dt>
-            <dd style="margin: 0 0 1rem 0; color: #333;">{{ user.email }}</dd>
+            <dt>Email</dt>
+            <dd>{{ user.email }}</dd>
             
-            <dt style="font-weight: 700; color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">Username</dt>
-            <dd style="margin: 0; color: #333;">{{ user.username }}</dd>
+            <dt>Username</dt>
+            <dd class="last">{{ user.username }}</dd>
         </dl>
-        <a href="#" style="color: #A0845B; text-decoration: none; font-weight: 600; display: inline-block; margin-top: 1rem;">Edit Profile →</a>
+        <a href="#" class="settings-link">Edit Profile →</a>
     </div>
 
-    <div class="settings-box" style="margin-top: 1.5rem;">
-        <h3 style="margin-top: 0; color: #333; font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-lock"></i> Security</h3>
-        <p style="color: #666; margin: 0 0 1rem 0;">Manage your password and security settings.</p>
-        <a href="#" style="color: #A0845B; text-decoration: none; font-weight: 600; display: inline-block;">Change Password →</a>
+    <div class="settings-box settings-box-spacing">
+        <h3 class="settings-box-title"><i class="fa-solid fa-lock"></i> Security</h3>
+        <p class="settings-description">Manage your password and security settings.</p>
+        <a href="#" class="settings-link">Change Password →</a>
     </div>
 
-    <div class="settings-box" style="margin-top: 1.5rem; background: #fff3cd; border-left-color: #ffc107;">
-        <h3 style="margin-top: 0; color: #856404; font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-gear"></i> Preferences</h3>
-        <p style="color: #856404; margin: 0;">Additional customization options coming soon.</p>
+    <div class="settings-box settings-box-spacing settings-box-warning">
+        <h3 class="settings-box-title-warning"><i class="fa-solid fa-gear"></i> Preferences</h3>
+        <p class="settings-description-warning">Additional customization options coming soon.</p>
     </div>
 </section>

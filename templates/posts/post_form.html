@@ -62,9 +62,9 @@
 			<label for="postImage">Featured Image</label>
 			<input type="file" id="postImage" name="featured_image" accept="image/*">
 			{% if post and post.featured_image %}
-			<div style="margin-top: 10px;">
+			<div class="current-image-preview">
 				<p>Current image:</p>
-				<img src="{{ post.featured_image.url }}" alt="Current featured image" style="max-width: 200px; height: auto;">
+				<img src="{{ post.featured_image.url }}" alt="Current featured image" class="current-image">
 			</div>
 			{% endif %}
 		</div>

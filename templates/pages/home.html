@@ -72,14 +72,14 @@
                 </article>
                 {% endfor %}
             {% else %}
-            <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <i class="fa-solid fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem; display: block;"></i>
-                <p style="color: #666; font-size: 1.1rem;">No posts yet. Check back soon!</p>
+            <div class="empty-state">
+                <i class="fa-solid fa-inbox empty-state-icon"></i>
+                <p class="empty-state-text">No posts yet. Check back soon!</p>
             </div>
             {% endif %}
         </div>
 
-        <div id="noResults" class="no-results" style="display: none;">
+        <div id="noResults" class="no-results">
             <p>No posts found. Try adjusting your search or filter.</p>
         </div>
     </div>

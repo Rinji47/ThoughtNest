@@ -5,312 +5,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
-<style>
-    .post-detail-container {
-        max-width: 900px;
-        margin: 2rem auto;
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .post-header {
-        padding: 3rem 3rem 0;
-        background: linear-gradient(135deg, #fafaf8 0%, #f5f3f0 100%);
-    }
-
-    .post-category {
-        display: inline-block;
-        background: linear-gradient(135deg, #8B6F47 0%, #A0845B 100%);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-    }
-
-    .post-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin: 1rem 0 1.5rem;
-        line-height: 1.2;
-    }
-
-    .post-meta-info {
-        display: flex;
-        gap: 2rem;
-        align-items: center;
-        padding-bottom: 2rem;
-        border-bottom: 2px solid #e9ecef;
-        flex-wrap: wrap;
-    }
-
-    .post-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        color: #6c757d;
-        font-size: 0.95rem;
-    }
-
-    .post-meta-item i {
-        color: #A0845B;
-    }
-
-    .post-featured-image {
-        width: 100%;
-        max-height: 500px;
-        overflow: hidden;
-        background: #f5f3f0;
-    }
-
-    .post-featured-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .post-body {
-        padding: 3rem;
-    }
-
-    .post-content {
-        font-size: 1.05rem;
-        line-height: 1.8;
-        color: #333;
-        margin-bottom: 1.5rem;
-        background: #fafaf8;
-        padding: 2rem;
-        border-radius: 8px;
-        border-left: 4px solid #A0845B;
-    }
-
-    .post-content p {
-        margin-bottom: 1.5rem;
-    }
-
-    .post-content h2 {
-        font-size: 1.8rem;
-        color: #2c3e50;
-        margin: 2rem 0 1rem;
-    }
-
-    .post-content h3 {
-        font-size: 1.4rem;
-        color: #2c3e50;
-        margin: 1.5rem 0 0.75rem;
-    }
-
-    .post-tags-section {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-        margin: 1.5rem 0 1.5rem 0;
-    }
-
-    .post-tag {
-        display: inline-block;
-        background: transparent;
-        color: #A0845B;
-        padding: 0;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        text-decoration: none;
-        border: none;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-
-    .post-tag:hover {
-        color: #8B6F47;
-        text-decoration: underline;
-    }
-
-    .post-actions-section {
-        display: flex;
-        gap: 1rem;
-        margin: 1.5rem 0 0 0;
-        align-items: center;
-    }
-
-    .like-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, #8B6F47 0%, #A0845B 100%);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .like-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(139, 111, 71, 0.4);
-    }
-
-    .like-btn.liked {
-        background: #d9534f;
-        box-shadow: 0 2px 8px rgba(217, 83, 79, 0.3);
-    }
-
-    .like-btn.liked:hover {
-        background: #c9302c;
-        box-shadow: 0 4px 12px rgba(201, 48, 44, 0.4);
-    }
-
-    .like-btn.liked i {
-        color: #fff;
-    }
-
-    .like-count {
-        margin-left: 1rem;
-        font-weight: 600;
-        color: #A0845B;
-        font-size: 1rem;
-    }
-
-    .comments-section {
-        padding: 0 3rem 3rem;
-        border-top: 2px solid #e9ecef;
-    }
-
-    .comments-title {
-        font-size: 1.6rem;
-        color: #2c3e50;
-        margin: 2rem 0 1.5rem;
-        font-weight: 700;
-    }
-
-    .comment-form {
-        margin-bottom: 2rem;
-        background: #fafaf8;
-        padding: 1.5rem;
-        border-radius: 8px;
-    }
-
-    .comment-textarea {
-        width: 100%;
-        min-height: 120px;
-        padding: 1rem;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        font-size: 1rem;
-        font-family: inherit;
-        resize: vertical;
-        margin-bottom: 1rem;
-    }
-
-    .comment-textarea:focus {
-        outline: none;
-        border-color: #A0845B;
-        box-shadow: 0 0 0 3px rgba(160, 132, 91, 0.1);
-    }
-
-    .submit-comment-btn {
-        background: linear-gradient(135deg, #8B6F47 0%, #A0845B 100%);
-        color: white;
-        padding: 0.8rem 1.5rem;
-        border: none;
-        border-radius: 6px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .submit-comment-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 111, 71, 0.3);
-    }
-
-    .comments-list {
-        display: grid;
-        gap: 1.5rem;
-    }
-
-    .comment-item {
-        background: #fafaf8;
-        padding: 1.5rem;
-        border-radius: 8px;
-        border-left: 4px solid #A0845B;
-    }
-
-    .comment-author {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 0.8rem;
-        align-items: baseline;
-    }
-
-    .comment-author strong {
-        color: #2c3e50;
-        font-weight: 600;
-    }
-
-    .comment-date {
-        color: #999;
-        font-size: 0.9rem;
-    }
-
-    .comment-text {
-        color: #333;
-        line-height: 1.6;
-        margin: 0;
-    }
-
-    .no-comments {
-        text-align: center;
-        padding: 2rem;
-        color: #999;
-        font-style: italic;
-    }
-
-    @media (max-width: 768px) {
-        .post-header {
-            padding: 2rem;
-        }
-
-        .post-title {
-            font-size: 1.8rem;
-        }
-
-        .post-body {
-            padding: 2rem;
-        }
-
-        .post-meta-info {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.8rem;
-        }
-
-        .comments-section {
-            padding: 0 2rem 2rem;
-        }
-    }
-</style>
-
-<script>
-// Provide instant visual feedback when clicking like button
-document.addEventListener('DOMContentLoaded', function() {
-    const likeBtn = document.getElementById('likeBtn');
-    if (likeBtn) {
-        likeBtn.addEventListener('click', function(e) {
-            // Optimistically toggle visual state
-            this.classList.toggle('liked');
-        });
-    }
-});
-</script>
 {% endblock %}
 
 {% block content %}
@@ -368,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- Like Section -->
         <div class="post-actions-section">
             {% if user.is_authenticated %}
-            <form method="post" action="{% url 'post_toggle_like' post.pk %}" style="display: flex; align-items: center; gap: 1rem;">
+            <form method="post" action="{% url 'post_toggle_like' post.pk %}" class="like-form">
                 {% csrf_token %}
                 <button type="submit" class="like-btn {% if user_has_liked %}liked{% endif %}" id="likeBtn" data-post-id="{{ post.pk }}" title="Like this post">
                     <i class="fa-solid fa-heart"></i>
@@ -376,8 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="like-count">{{ post.likes.count }} likes</span>
             </form>
             {% else %}
-            <p style="margin: 0; color: #666">
-                <a href="{% url 'login' %}" style="color: #A0845B; text-decoration: none; font-weight: 600">Log in</a> to like
+            <p class="not-logged-in-text">
+                <a href="{% url 'login' %}" class="login-link">Log in</a> to like
             </p>
             {% endif %}
         </div>
@@ -396,9 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </button>
         </form>
         {% else %}
-        <div style="background: #fafaf8; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-            <p style="margin: 0; color: #666">
-                <a href="{% url 'login' %}" style="color: #A0845B; text-decoration: none; font-weight: 600">Log in</a> to comment on this post.
+        <div class="comment-login-prompt">
+            <p class="comment-login-text">
+                <a href="{% url 'login' %}" class="login-link">Log in</a> to comment on this post.
             </p>
         </div>
         {% endif %}
@@ -418,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         {% else %}
         <div class="no-comments">
-            <p><i class="fa-solid fa-comments" style="font-size: 2rem; color: #ddd; display: block; margin-bottom: 1rem;"></i>No comments yet. Be the first to share your thoughts!</p>
+            <p><i class="fa-solid fa-comments no-comments-icon"></i>No comments yet. Be the first to share your thoughts!</p>
         </div>
         {% endif %}
     </section>
