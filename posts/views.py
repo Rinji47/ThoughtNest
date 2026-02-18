@@ -225,27 +225,6 @@ def create_category_page(request):
 
 @login_required
 @require_POST
-def admin_create_category(request):
-	if not request.user.is_staff:
-		messages.error(request, 'You do not have permission.')
-		return redirect('home')
-	
-	name = request.POST.get('name', '').strip()
-	if not name:
-		messages.error(request, 'Category name is required.')
-		return redirect('admin_categories')
-	
-	if Category.objects.filter(name=name).exists():
-		messages.error(request, 'Category with this name already exists.')
-		return redirect('admin_categories')
-	
-	Category.objects.create(name=name)
-	messages.success(request, 'Category created successfully!')
-	return redirect('admin_categories')
-
-
-@login_required
-@require_POST
 def admin_delete_category(request, pk):
 	if not request.user.is_staff:
 		messages.error(request, 'You do not have permission.')
@@ -259,7 +238,7 @@ def admin_delete_category(request, pk):
 
 @login_required
 @require_POST
-def admin_delete_post(request, pk):
+def delete_post(request, pk):
 	post = get_object_or_404(Post, pk=pk)
 	if not (request.user.is_staff or request.user == post.author):
 		messages.error(request, 'You do not have permission to delete this post.')
