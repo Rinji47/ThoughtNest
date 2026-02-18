@@ -71,7 +71,7 @@
 
 		<div class="form-group">
 			<label for="postContent">Content</label>
-			<textarea id="postContent" name="content" rows="10" required>{% if post %}{{ post.content.html|safe }}{% endif %}</textarea>
+			<textarea id="postContent" name="content" rows="10" required>{% if post %}{{ post.content }}{% endif %}</textarea>
 		</div>
 
 		<button type="submit" class="btn-primary">

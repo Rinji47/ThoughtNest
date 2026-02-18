@@ -144,8 +144,27 @@ def post_toggle_like(request, pk):
 
 	return redirect('post_detail', pk=post.pk)
 
+@login_required
+def user_manage_posts(request):
 
-# ========== ADMIN VIEWS ==========
+	posts = Post.objects.filter(author=request.user).select_related('category').prefetch_related('comments', 'likes').order_by('-created_at')
+	context = {'posts': posts}
+	return render(request, 'posts/user_posts.html', context)
+
+@login_required
+@require_POST
+def delete_post(request, pk):
+	post = get_object_or_404(Post, pk=pk)
+	if not (request.user.is_staff or request.user == post.author):
+		messages.error(request, 'You do not have permission to delete this post.')
+		return redirect('post_detail', pk=post.pk)
+	
+	post.delete()
+	messages.success(request, 'Post deleted successfully!')
+	return redirect('admin_posts' if request.user.is_staff else 'profile')
+
+
+# ADMIN VIEWS
 
 @login_required
 def admin_posts(request):
@@ -234,16 +253,3 @@ def admin_delete_category(request, pk):
 	category.delete()
 	messages.success(request, 'Category deleted successfully!')
 	return redirect('admin_categories')
-
-
-@login_required
-@require_POST
-def delete_post(request, pk):
-	post = get_object_or_404(Post, pk=pk)
-	if not (request.user.is_staff or request.user == post.author):
-		messages.error(request, 'You do not have permission to delete this post.')
-		return redirect('post_detail', pk=post.pk)
-	
-	post.delete()
-	messages.success(request, 'Post deleted successfully!')
-	return redirect('admin_posts' if request.user.is_staff else 'profile')

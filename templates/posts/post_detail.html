@@ -28,8 +28,7 @@
         {% endif %}
 
         <div class="post-detail-content">
-            {{ post.content.html|safe }}
-        </div>
+            {{ post.content|linebreaks }}
 
         <!-- Like Section -->
         <div class="post-actions">

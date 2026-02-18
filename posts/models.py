@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
-from django_quill.fields import QuillField
 
 
 class Category(models.Model):
@@ -75,7 +74,7 @@ class Post(models.Model):
 	title = models.CharField(max_length=200)
 	slug = models.SlugField(max_length=220, unique=True, blank=True)
 	featured_image = models.ImageField(upload_to='posts/', blank=True, null=True, help_text="Featured image for the post")
-	content = QuillField()
+	content = models.TextField()
 	status = models.CharField(
 		max_length=20,
 		choices=STATUS_CHOICES,
