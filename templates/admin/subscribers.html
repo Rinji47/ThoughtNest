@@ -8,12 +8,19 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="admin-wrapper">
     {% include 'admin/sidebar.html' %}
     <div class="admin-content">
-        <div class="admin-header">
-            <h1>Email Subscribers</h1>
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         </div>
+    {% endif %}
         <div class="settings-box">
             <p>Subscriber management coming soon.</p>
         </div>

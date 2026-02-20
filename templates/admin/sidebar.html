@@ -6,24 +6,22 @@
     </div>
     <nav class="sidebar-nav">
         <ul>
-            <li><a href="{% url 'admin_dashboard' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_dashboard' %}active{% endif %}">
-                <i class="fa-solid fa-gauge"></i> Dashboard
-            </a></li>
-            <li><a href="{% url 'admin_posts' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_posts' %}active{% endif %}">
-                <i class="fa-solid fa-pen-nib"></i> Posts
-            </a></li>
-            <li><a href="{% url 'admin_comments' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_comments' %}active{% endif %}">
-                <i class="fa-solid fa-comment"></i> Comments
-            </a></li>
-            <li><a href="{% url 'admin_subscribers' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_subscribers' %}active{% endif %}">
-                <i class="fa-solid fa-envelope"></i> Subscribers
-            </a></li>
-            <li><a href="{% url 'admin_settings' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_settings' %}active{% endif %}">
-                <i class="fa-solid fa-gear"></i> Settings
-            </a></li>
-            <li><a href="{% url 'admin_categories' %}" class="sidebar-link {% if request.resolver_match.name == 'admin_categories' %}active{% endif %}">
-                <i class="fa-solid fa-folder"></i> Categories
-            </a></li>
+            <li>{% url 'admin_dashboard' as dash_url %}<a href="{{ dash_url }}" class="sidebar-link {% if request.path == dash_url %}active{% endif %}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+            <li>{% url 'admin_posts' as posts_url %}<a href="{{ posts_url }}" class="sidebar-link {% if request.path == posts_url %}active{% endif %}"><i class="fa-solid fa-pen-nib"></i> Posts</a></li>
+            <li>{% url 'admin_comments' as comments_url %}<a href="{{ comments_url }}" class="sidebar-link {% if request.path == comments_url %}active{% endif %}"><i class="fa-solid fa-comment"></i> Comments</a></li>
+            <li>{% url 'admin_likes' as likes_url %}<a href="{{ likes_url }}" class="sidebar-link {% if request.path == likes_url %}active{% endif %}"><i class="fa-solid fa-heart"></i> Likes</a></li>
+            <li>{% url 'admin_subscribers' as subs_url %}<a href="{{ subs_url }}" class="sidebar-link {% if request.path == subs_url %}active{% endif %}"><i class="fa-solid fa-envelope"></i> Subscribers</a></li>
+            <li>{% url 'admin_settings' as settings_url %}<a href="{{ settings_url }}" class="sidebar-link {% if request.path == settings_url %}active{% endif %}"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li>{% url 'admin_categories' as cats_url %}<a href="{{ cats_url }}" class="sidebar-link {% if request.path == cats_url %}active{% endif %}"><i class="fa-solid fa-folder"></i> Categories</a></li>
         </ul>
     </nav>
+
+    <div class="sidebar-footer">
+        <a href="{% url 'home' %}" class="sidebar-btn sidebar-btn-secondary" aria-label="Return to home page">
+            <i class="fa-solid fa-arrow-left"></i> Home
+        </a>
+        <a href="{% url 'logout' %}" class="sidebar-btn sidebar-btn-danger" aria-label="Logout from admin">
+            <i class="fa-solid fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
 </aside>

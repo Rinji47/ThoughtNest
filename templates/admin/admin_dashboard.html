@@ -12,9 +12,15 @@
 <div class="dashboard-wrapper">
     {% include 'admin/sidebar.html' %}
     <div class="admin-content">
-        <div class="admin-header">
-            <h1>Admin Dashboard</h1>
-        </div>
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div class="admin-stats">
             <div class="stat-card">

@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Count, Q
+from datetime import datetime, timedelta
 from .forms import UserRegistrationForm, UserLoginForm
 from posts.models import Comment, Like, Post, Category
-from django.db.models import Count
 
 
 def user_register(request):
@@ -115,16 +116,49 @@ def admin_page(request):
 
 
 @login_required
+
 def profile(request):
-	user_posts = Post.objects.filter(author=request.user).order_by('-created_at')
-	user_post_count = user_posts.count()
+	"""Display user profile overview with recent comments and liked posts for sidebar"""
+	user_post_count = Post.objects.filter(author=request.user).count()
 	user_like_count = Like.objects.filter(user=request.user).count()
 	user_comment_count = Comment.objects.filter(author=request.user).count()
-	
+
+	# Recent comments (limit 5)
+	my_comments = Comment.objects.filter(author=request.user).select_related('post').order_by('-created_at')[:5]
+	# Recent liked posts (limit 5, most recent likes)
+	liked_post_ids = Like.objects.filter(user=request.user).order_by('-created_at').values_list('post_id', flat=True)[:5]
+	liked_posts = Post.objects.filter(id__in=liked_post_ids)
+
+	# User profile info
+	profile = getattr(request.user, 'profile', None)
+	bio = profile.bio if profile else ''
+	location = profile.location if profile else ''
+	website = profile.website if profile else ''
+
 	context = {
-		'user_posts': user_posts,
 		'user_post_count': user_post_count,
 		'user_like_count': user_like_count,
 		'user_comment_count': user_comment_count,
+		'my_comments': my_comments,
+		'liked_posts': liked_posts,
+		'bio': bio,
+		'location': location,
+		'website': website,
+		'profile': profile,
 	}
-	return render(request, 'users/profile.html', context)
+	return render(request, 'users/profile_overview.html', context)
+
+
+@login_required
+
+def profile_settings(request):
+	"""Display user profile settings with sidebar context"""
+	# Sidebar context
+	my_comments = Comment.objects.filter(author=request.user).select_related('post').order_by('-created_at')[:5]
+	liked_post_ids = Like.objects.filter(user=request.user).order_by('-created_at').values_list('post_id', flat=True)[:5]
+	liked_posts = Post.objects.filter(id__in=liked_post_ids)
+	context = {
+		'my_comments': my_comments,
+		'liked_posts': liked_posts,
+	}
+	return render(request, 'users/profile_settings.html', context)

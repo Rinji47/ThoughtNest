@@ -8,6 +8,16 @@
 {% endblock %}
 
 {% block content %}
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="container">
     <h1 class="page-title">Browse by Category</h1>
     <p class="page-subtitle">Explore posts organized by topics</p>

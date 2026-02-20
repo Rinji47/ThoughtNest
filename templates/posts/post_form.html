@@ -10,6 +10,16 @@
 {% endblock %}
 
 {% block content %}
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="container">
 	<h1 class="page-title">
 		{% if mode == 'edit' %}Edit Post{% else %}Create New Post{% endif %}

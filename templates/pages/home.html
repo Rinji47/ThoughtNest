@@ -8,6 +8,16 @@
 {% endblock %}
 
 {% block content %}
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-content">

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liked Posts - ThoughtNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+    {% include 'users/profile_sidebar.html' %}
+    <main class="profile-content">
+        <section class="section-container">
+            <!-- Filters -->
+            <form method="get" class="posts-filter-form">
+                <div class="filter-row">
+                    <input type="text" name="q" placeholder="Search liked posts..." value="{{ search_query }}" class="filter-input">
+                    <div class="filter-select-grid">
+                        <select name="date_range" class="filter-select">
+                            <option value="">All Time</option>
+                            <option value="today" {% if selected_date_range == 'today' %}selected{% endif %}>Today</option>
+                            <option value="week" {% if selected_date_range == 'week' %}selected{% endif %}>Last 7 Days</option>
+                            <option value="month" {% if selected_date_range == 'month' %}selected{% endif %}>Last 30 Days</option>
+                            <option value="year" {% if selected_date_range == 'year' %}selected{% endif %}>Last Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-filter"><i class="fa-solid fa-search"></i> Apply</button>
+                        {% if search_query or selected_date_range %}
+                            <a href="{% url 'user_my_likes' %}" class="btn-filter btn-filter-clear"><i class="fa-solid fa-redo"></i> Clear</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+            {% if likes %}
+                <p class="posts-found-count">Found <strong>{{ likes.count }}</strong> liked post{% if likes.count != 1 %}s{% endif %}</p>
+                <div class="user-posts-grid">
+                    {% for like in likes %}
+                    {% with post=like.post %}
+                    <div class="user-post-card">
+                        <div class="user-post-card-image">
+                            {% if post.featured_image %}
+                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                            {% else %}
+                                <i class="fa-solid fa-image"></i>
+                            {% endif %}
+                        </div>
+                        <div class="user-post-card-body">
+                            <div class="user-post-card-badges">
+                                {% if post.category %}
+                                    <span class="badge-category">{{ post.category.name }}</span>
+                                {% endif %}
+                            </div>
+                            <h3 class="user-post-card-title">
+                                <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                            </h3>
+                            <p class="user-post-card-excerpt">{{ post.content|truncatewords:20 }}</p>
+                            <div class="user-post-card-stats">
+                                <span><i class="fa-solid fa-calendar"></i> {{ post.created_at|date:"M d, Y" }}</span>
+                                <span><i class="fa-solid fa-heart"></i> {{ post.likes.count }}</span>
+                                <span><i class="fa-solid fa-comment"></i> {{ post.comments.count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="posts-empty-state">
+                    <i class="fa-solid fa-heart no-comments-icon"></i>
+                    {% if search_query or selected_date_range %}
+                        <p>No liked posts found matching your filters.</p>
+                        <a href="{% url 'user_my_likes' %}" class="btn-filter">
+                            <i class="fa-solid fa-redo"></i> Clear Filters
+                        </a>
+                    {% else %}
+                        <p>You haven't liked any posts yet.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</div>
+{% endblock %}

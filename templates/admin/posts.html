@@ -8,12 +8,52 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="admin-wrapper">
+
     {% include 'admin/sidebar.html' %}
     <div class="admin-content">
-        <div class="admin-header">
-            <h1>Manage Posts</h1>
-        </div>
+        
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- Modern Filter/Search Box -->
+        <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem 1.5rem 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
+            <div style="display: flex; flex-direction: column; gap: 1.1rem;">
+                <input type="text" name="search" placeholder="Search posts..." value="{{ request.GET.search }}" style="border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.9rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+                <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
+                    <select name="author" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+                        <option value="">All Authors</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}" {% if request.GET.author == user.id|stringformat:'s' %}selected{% endif %}>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="category" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="status" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+                        <option value="">All Statuses</option>
+                        <option value="published" {% if request.GET.status == 'published' %}selected{% endif %}>Published</option>
+                        <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+                    </select>
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    <button type="submit" class="btn-filter" style="background: #7a5642; color: #fff; border-radius: 10px; padding: 0.7rem 1.7rem; font-weight: 600; font-size: 1.08rem; border: none; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-magnifying-glass"></i> Apply</button>
+                    {% if request.GET.search or request.GET.author or request.GET.category or request.GET.status %}
+                        <a href="{% url 'admin_posts' %}" class="btn-filter btn-filter-clear" style="margin-left: 0.7rem;"><i class="fa-solid fa-redo"></i> Clear</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
 
         <table class="admin-table">
             <thead>

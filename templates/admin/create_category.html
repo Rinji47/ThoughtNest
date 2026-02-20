@@ -1,36 +1,52 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 {% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Category - ThoughtNest Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/admin-form.css' %}">
-</head>
-<body>
-    <div class="form-wrapper">
-        <div class="form-header">
-            <h1><i class="fa-solid fa-folder-plus"></i> Create New Category</h1>
-            <p>Add a new category for organizing posts</p>
+
+{% block title %}Create Category - ThoughtNest Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    {% include 'admin/sidebar.html' %}
+    <div class="admin-content">
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="admin-toolbar">
+            <a href="{% url 'admin_categories' %}" class="btn-primary btn-secondary-style">
+                <i class="fa-solid fa-arrow-left"></i> Back to Categories
+            </a>
         </div>
-
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="categoryName">Category Name</label>
-                <input type="text" id="categoryName" name="name" placeholder="Enter category name" required autofocus>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-check"></i> Create Category
-                </button>
-                <a href="{% url 'admin_categories' %}" class="btn btn-secondary">
-                    <i class="fa-solid fa-times"></i> Cancel
-                </a>
-            </div>
-        </form>
+        <div class="create-category-card">
+            <p class="create-category-subtitle">Add a new category for organizing posts</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="categoryName">Category Name</label>
+                    <input type="text" id="categoryName" name="name" placeholder="Enter category name" required autofocus>
+                </div>
+                <div class="form-actions-row">
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-check"></i> Create Category
+                    </button>
+                    <a href="{% url 'admin_categories' %}" class="btn-cancel">
+                        <i class="fa-solid fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin_dashboard.js' %}"></script>
+{% endblock %}

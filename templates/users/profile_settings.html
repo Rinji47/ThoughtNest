@@ -1,29 +1,61 @@
-<!-- Account Settings Section -->
-<section id="settings" class="section-container profile-section">
-    <h2 class="section-subtitle">Account Settings</h2>
-    <div class="settings-box">
-        <h3 class="settings-box-title"><i class="fa-solid fa-user-circle"></i> Profile Information</h3>
-        <dl class="settings-dl">
-            <dt>Full Name</dt>
-            <dd>{{ user.get_full_name|default:"Not set" }}</dd>
-            
-            <dt>Email</dt>
-            <dd>{{ user.email }}</dd>
-            
-            <dt>Username</dt>
-            <dd class="last">{{ user.username }}</dd>
-        </dl>
-        <a href="#" class="settings-link">Edit Profile →</a>
-    </div>
+{% extends "base.html" %}
+{% load static %}
 
-    <div class="settings-box settings-box-spacing">
-        <h3 class="settings-box-title"><i class="fa-solid fa-lock"></i> Security</h3>
-        <p class="settings-description">Manage your password and security settings.</p>
-        <a href="#" class="settings-link">Change Password →</a>
-    </div>
+{% block title %}Account Settings - ThoughtNest{% endblock %}
 
-    <div class="settings-box settings-box-spacing settings-box-warning">
-        <h3 class="settings-box-title-warning"><i class="fa-solid fa-gear"></i> Preferences</h3>
-        <p class="settings-description-warning">Additional customization options coming soon.</p>
-    </div>
-</section>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+    {% include 'users/profile_sidebar.html' %}
+
+    <main class="profile-content">
+        
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <section class="section-container">
+            <div class="settings-box">
+                <h3 class="settings-box-title"><i class="fa-solid fa-user-circle"></i> Profile Information</h3>
+                <dl class="settings-dl">
+                    <dt>Full Name</dt>
+                    <dd>{{ user.get_full_name|default:"Not set" }}</dd>
+                    
+                    <dt>Email</dt>
+                    <dd>{{ user.email }}</dd>
+                    
+                    <dt>Username</dt>
+                    <dd class="last">{{ user.username }}</dd>
+                </dl>
+                <a href="#" class="settings-link">Edit Profile →</a>
+            </div>
+
+            <div class="settings-box settings-box-spacing">
+                <h3 class="settings-box-title"><i class="fa-solid fa-lock"></i> Security</h3>
+                <p class="settings-description">Manage your password and security settings.</p>
+                <a href="#" class="settings-link">Change Password →</a>
+            </div>
+
+            <div class="settings-box settings-box-spacing settings-box-warning">
+                <h3 class="settings-box-title-warning"><i class="fa-solid fa-gear"></i> Preferences</h3>
+                <p class="settings-description-warning">Additional customization options coming soon.</p>
+            </div>
+
+            <div class="settings-box settings-box-spacing settings-box-danger">
+                <h3 class="settings-box-title-warning"><i class="fa-solid fa-sign-out-alt"></i> Sign Out</h3>
+                <p class="settings-description-warning">End your current session.</p>
+                <a href="{% url 'logout' %}" class="settings-link settings-link-danger">Logout →</a>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

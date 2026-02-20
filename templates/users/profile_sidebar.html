@@ -1,0 +1,76 @@
+<aside class="profile-sidebar" role="complementary" aria-label="User profile navigation">
+    <div class="profile-header-section">
+        <div class="profile-avatar" aria-hidden="false">
+            <i class="fa-solid fa-user" aria-label="User profile icon"></i>
+        </div>
+        <h2 class="profile-name">{{ user.get_full_name|default:user.username }}</h2>
+        <p class="profile-email">{{ user.email }}</p>
+    </div>
+
+    <div class="profile-stats-section">
+        <div class="stat-item">
+            <span class="stat-number">{{ user_post_count }}</span>
+            <span class="stat-label">Posts</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ user_like_count }}</span>
+            <span class="stat-label">Likes</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ user_comment_count }}</span>
+            <span class="stat-label">Comments</span>
+        </div>
+    </div>
+
+
+
+    <nav class="profile-nav" aria-label="Profile section links">
+        <ul>
+            <li>
+                <a href="{% url 'profile' %}"
+                   class="profile-nav-link{% if request.resolver_match.url_name == 'profile' %} active{% endif %}"
+                   {% if request.resolver_match.url_name == 'profile' %}aria-current="page"{% endif %}>
+                    Overview
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'user_manage_posts' %}"
+                   class="profile-nav-link{% if request.resolver_match.url_name == 'user_manage_posts' %} active{% endif %}"
+                   {% if request.resolver_match.url_name == 'user_manage_posts' %} aria-current="page"{% endif %}>
+                    My Posts
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'user_my_comments' %}"
+                   class="profile-nav-link{% if request.resolver_match.url_name == 'user_my_comments' %} active{% endif %}"
+                   {% if request.resolver_match.url_name == 'user_my_comments' %} aria-current="page"{% endif %}>
+                    My Comments
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'user_my_likes' %}"
+                   class="profile-nav-link{% if request.resolver_match.url_name == 'user_my_likes' %} active{% endif %}"
+                   {% if request.resolver_match.url_name == 'user_my_likes' %} aria-current="page"{% endif %}>
+                    Liked Posts
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'profile_settings' %}"
+                   class="profile-nav-link{% if request.resolver_match.url_name == 'profile_settings' %} active{% endif %}"
+                   {% if request.resolver_match.url_name == 'profile_settings' %} aria-current="page"{% endif %}>
+                    Settings
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+    <div class="profile-sidebar-footer">
+        <a href="{% url 'home' %}" class="sidebar-btn sidebar-btn-secondary" aria-label="Return to home page">
+            <i class="fa-solid fa-arrow-left"></i> Home
+        </a>
+        <a href="{% url 'logout' %}" class="sidebar-btn sidebar-btn-danger" aria-label="Logout from account">
+            <i class="fa-solid fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</aside>

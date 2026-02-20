@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Comments - ThoughtNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+    {% include 'users/profile_sidebar.html' %}
+    <main class="profile-content">
+        <section class="section-container">
+            <!-- Filters -->
+            <form method="get" class="posts-filter-form">
+                <div class="filter-row filter-row-horizontal">
+                    <input type="text" name="search" placeholder="Search comments..." value="{{ request.GET.search }}" class="filter-input">
+                    <select name="post" class="filter-select">
+                        <option value="">All Posts</option>
+                        {% for post in user_posts %}
+                            <option value="{{ post.id }}" {% if request.GET.post == post.id|stringformat:'s' %}selected{% endif %}>{{ post.title|truncatechars:30 }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="time" class="filter-select">
+                        <option value="">All Time</option>
+                        <option value="today" {% if request.GET.time == 'today' %}selected{% endif %}>Today</option>
+                        <option value="week" {% if request.GET.time == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if request.GET.time == 'month' %}selected{% endif %}>This Month</option>
+                    </select>
+                    <button type="submit" class="btn-filter"><i class="fa-solid fa-magnifying-glass"></i> Apply</button>
+                </div>
+            </form>
+            {% if comments %}
+                <p class="posts-found-count">Found <strong>{{ comments.count }}</strong> comment{% if comments.count != 1 %}s{% endif %}</p>
+                <div class="user-comments-list">
+                    {% for comment in comments %}
+                    <div class="user-comment-card" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; background: #fffaf5; border-radius: 16px; box-shadow: 0 2px 8px rgba(107,75,62,0.06); padding: 1.2rem 1.5rem; margin-bottom: 1.2rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.3rem;">
+                                <a href="{% url 'post_detail' comment.post.pk %}" class="user-comment-post-title" style="font-weight: 600; color: var(--primary-color); font-size: 1.1rem; text-decoration: underline;">{{ comment.post.title|truncatechars:40 }}</a>
+                                <span class="user-comment-date" style="color: #a0845b; font-size: 0.95rem;">{{ comment.created_at|date:"M d, Y H:i" }}</span>
+                            </div>
+                            <div class="user-comment-content" style="font-size: 1.08rem; color: #2b251f;">{{ comment.content }}</div>
+                        </div>
+                        <form method="post" action="{% url 'user_delete_comment' comment.pk %}" style="margin: 0; align-self: center;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-sm btn-delete" title="Delete comment" style="border-radius: 12px; padding: 0.7rem 0.9rem; font-size: 1.1rem;" onclick="return confirm('Delete this comment?');">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="posts-empty-state">
+                    <i class="fa-solid fa-comments no-comments-icon"></i>
+                    {% if search_query or selected_post or selected_date_range %}
+                        <p>No comments found matching your filters.</p>
+                        <a href="{% url 'user_my_comments' %}" class="btn-filter">
+                            <i class="fa-solid fa-redo"></i> Clear Filters
+                        </a>
+                    {% else %}
+                        <p>You haven't made any comments yet.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</div>
+{% endblock %}
