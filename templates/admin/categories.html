@@ -12,8 +12,9 @@
 <div class="admin-wrapper">
     {% include 'admin/sidebar.html' %}
 
-
     <div class="admin-content">
+        <h1>Categories Management</h1>
+
         {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
@@ -23,11 +24,32 @@
                 {% endfor %}
             </div>
         {% endif %}
+
+        <!-- Filter/Search Box -->
+        <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Category search -->
+                <input type="text" name="category_search" placeholder="Search by category name..." value="{{ category_search }}" style="flex:1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+
+                <div style="margin-top: 0.5rem;">
+                    <button type="submit" class="btn-filter" style="background: #7a5642; color:#fff; border-radius:10px; padding:0.7rem 1.7rem; font-weight:600; font-size:1.08rem; border:none; display:inline-flex; align-items:center; gap:0.5rem;">
+                        <i class="fa-solid fa-magnifying-glass"></i> Apply
+                    </button>
+                    {% if category_search %}
+                        <a href="{% url 'admin_categories' %}" class="btn-filter btn-filter-clear" style="margin-left:0.7rem;">
+                            <i class="fa-solid fa-redo"></i> Clear
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
         <div class="admin-toolbar">
             <a href="{% url 'create_category_page' %}" class="btn-primary">
                 <i class="fa-solid fa-plus"></i> Create New Category
             </a>
         </div>
+
         <table class="admin-table">
             <thead>
                 <tr>
@@ -44,7 +66,7 @@
                     <td>{{ category.name }}</td>
                     <td>{{ category.slug }}</td>
                     <td>{{ category.post_count }}</td>
-                    <td>{{ category.created_at|date:"M d, Y" }}</td>
+                    <td>{{ category.created_at|date:"M d, Y H:i" }}</td>
                     <td class="action-buttons">
                         <form method="post" action="{% url 'admin_delete_category' category.pk %}" class="admin-form-inline">
                             {% csrf_token %}
@@ -54,11 +76,27 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">No categories yet.</td>
+                    <td colspan="5">No categories found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="margin-top:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+            {% if page_obj.has_previous %}
+                <a href="?{% if category_search %}category_search={{ category_search }}&{% endif %}page={{ page_obj.previous_page_number }}" class="btn-pagination">&laquo; Previous</a>
+            {% endif %}
+
+            <span class="current-page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?{% if category_search %}category_search={{ category_search }}&{% endif %}page={{ page_obj.next_page_number }}" class="btn-pagination">Next &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
     </div>
 </div>
 {% endblock %}

@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 
-from .models import Category, Comment, Like, Post, Tag
+from .models import Category, Comment, Like, Post, Tag, SiteSettings
 
 
 
@@ -60,37 +60,43 @@ def user_my_comments(request):
 
 @login_required
 def user_my_likes(request):
-	likes = Like.objects.filter(user=request.user).select_related('post').order_by('-created_at')
+    likes = Like.objects.filter(user=request.user).select_related('post').order_by('-created_at')
 
-	# Filters
-	search_query = request.GET.get('q', '').strip()
-	date_range = request.GET.get('date_range', '')
+    # Filters
+    search_query = request.GET.get('q', '').strip()
+    date_range = request.GET.get('date_range', '')
 
-	if search_query:
-		likes = likes.filter(post__title__icontains=search_query)
-	if date_range:
-		today = datetime.now().date()
-		if date_range == 'today':
-			likes = likes.filter(created_at__date=today)
-		elif date_range == 'week':
-			start_date = today - timedelta(days=7)
-			likes = likes.filter(created_at__date__gte=start_date)
-		elif date_range == 'month':
-			start_date = today - timedelta(days=30)
-			likes = likes.filter(created_at__date__gte=start_date)
-		elif date_range == 'year':
-			start_date = today - timedelta(days=365)
-			likes = likes.filter(created_at__date__gte=start_date)
+    if search_query:
+        likes = likes.filter(post__title__icontains=search_query)
+    if date_range:
+        today = datetime.now().date()
+        if date_range == 'today':
+            likes = likes.filter(created_at__date=today)
+        elif date_range == 'week':
+            start_date = today - timedelta(days=7)
+            likes = likes.filter(created_at__date__gte=start_date)
+        elif date_range == 'month':
+            start_date = today - timedelta(days=30)
+            likes = likes.filter(created_at__date__gte=start_date)
+        elif date_range == 'year':
+            start_date = today - timedelta(days=365)
+            likes = likes.filter(created_at__date__gte=start_date)
 
-	context = {
-		'likes': likes,
-		'search_query': search_query,
-		'selected_date_range': date_range,
-	}
-	return render(request, 'users/profile_likes.html', context)
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
-# Delete user's own comment
+    # Pagination: 10 likes per page
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(likes, 10)
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'likes': page_obj,
+        'search_query': search_query,
+        'selected_date_range': date_range,
+        'paginator': paginator,
+        'page_obj': page_obj,
+    }
+    return render(request, 'users/profile_likes.html', context)
+
+
 @login_required
 def user_delete_comment(request, pk):
 	comment = Comment.objects.filter(pk=pk, author=request.user).first()
@@ -100,7 +106,6 @@ def user_delete_comment(request, pk):
 	comment.delete()
 	messages.success(request, 'Comment deleted successfully!')
 	return redirect('user_my_comments')
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def admin_likes(request):
@@ -112,12 +117,11 @@ def admin_likes(request):
     likes = Like.objects.select_related('user', 'post').order_by('-created_at')
 
     # Filters
-    user_search = request.GET.get('user_search', '').strip()  # updated from 'user'
+    user_search = request.GET.get('user_search', '').strip()  # Filter by username / name
     post_id = request.GET.get('post', '')
     date_range = request.GET.get('date_range', '')
 
     if user_search:
-        # Filter likes by username or full name
         likes = likes.filter(
             Q(user__username__icontains=user_search) |
             Q(user__first_name__icontains=user_search) |
@@ -142,32 +146,47 @@ def admin_likes(request):
             likes = likes.filter(created_at__date__gte=start_date)
 
     posts = Post.objects.all().order_by('title')
+
+    # Pagination: 15 likes per page
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(likes, 15)
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'likes': likes,
+        'likes': page_obj,
         'posts': posts,
         'selected_post': post_id,
         'selected_date_range': date_range,
-        'user_search': user_search,  # pass it to template for the input value
+        'user_search': user_search,  # pass it to template
+        'paginator': paginator,
+        'page_obj': page_obj,
     }
 
     return render(request, 'admin/likes.html', context)
 
 
 def categories(request):
-	categories_list = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')
-	for cat in categories_list:
-		cat.recent_posts = cat.posts.filter(status=Post.STATUS_PUBLISHED).select_related('author').order_by('-created_at')[:2]
-	tags = Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')
-	
-	from .models import SiteSettings
-	settings_obj = SiteSettings.load()
+    # Categories with post counts
+    categories_list = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')
+    for cat in categories_list:
+        cat.recent_posts = cat.posts.filter(status=Post.STATUS_PUBLISHED).select_related('author').order_by('-created_at')[:2]
 
-	context = {
-		'categories': categories_list, 
-		'tags': tags,
-		'site_settings': settings_obj
-	}
-	return render(request, 'pages/categories.html', context)
+    # Tags with post counts
+    tags_qs = Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')
+
+    # Convert QuerySet to list of dicts for JSON serialization
+    tags_list = list(tags_qs.values('id', 'name'))
+
+    # Site settings
+    settings_obj = SiteSettings.load()
+
+    context = {
+        'categories': categories_list,
+        'tags': tags_qs,           # for displaying tags in template
+        'all_tags_json': tags_list, # for JS search
+        'site_settings': settings_obj,
+    }
+    return render(request, 'pages/categories.html', context)
 
 
 def post_detail(request, pk):
@@ -191,51 +210,51 @@ def post_detail(request, pk):
 
 @login_required
 def post_create(request):
-	if request.method == 'POST':
-		title = request.POST.get('title', '').strip()
-		category_id = request.POST.get('category')
-		tags_input = request.POST.get('tags', '').strip()
-		content = request.POST.get('content', '').strip()
-		status = request.POST.get('status', Post.STATUS_PUBLISHED)
-		# featured_image removed
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        category_id = request.POST.get('category')
+        tags_input = request.POST.get('tags', '').strip()
+        content = request.POST.get('content', '').strip()
+        status = request.POST.get('status', Post.STATUS_PUBLISHED)
+        # featured_image removed
 
-		if not title:
-			messages.error(request, 'Title is required.')
-			return redirect('post_create')
-		
-		if not content:
-			messages.error(request, 'Content is required.')
-			return redirect('post_create')
+        if not title:
+            messages.error(request, 'Title is required.')
+            return redirect('post_create')
+        
+        if not content:
+            messages.error(request, 'Content is required.')
+            return redirect('post_create')
 
-		post = Post.objects.create(
-			author=request.user,
-			title=title,
-			content=content,
-			status=status,
-			category_id=category_id if category_id else None,
-			# featured_image removed
-		)
+        post = Post.objects.create(
+            author=request.user,
+            title=title,
+            content=content,
+            status=status,
+            category_id=category_id if category_id else None,
+            # featured_image removed
+        )
 
-		# Handle tags
-		if tags_input:
-			tag_names = [tag.strip() for tag in tags_input.split(',')]
-			tag_names = [tag.lstrip("#") for tag in tag_names]
-			for tag_name in tag_names:
-				if tag_name:
-					tag, _ = Tag.objects.get_or_create(name=tag_name)
-					post.tags.add(tag)
+        # Handle tags
+        if tags_input:
+            tag_names = [tag.strip().lstrip("#") for tag in tags_input.split(',')]
+            for tag_name in tag_names:
+                if tag_name:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name)
+                    post.tags.add(tag)
 
-		messages.success(request, 'Post created successfully!')
-		return redirect('post_detail', pk=post.pk)
+        messages.success(request, 'Post created successfully!')
+        return redirect('post_detail', pk=post.pk)
 
-	context = {
-		'mode': 'create',
-		'categories': Category.objects.all(),
-		'tags': Tag.objects.all(),
-		'popular_tags': Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')[:10],
-		'all_tag_names': list(Tag.objects.order_by('name').values_list('name', flat=True)),
-	}
-	return render(request, 'posts/post_form.html', context)
+    # Context for GET request / rendering form
+    context = {
+        'mode': 'create',
+        'categories': Category.objects.all(),
+        'popular_tags': Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count', 'name')[:10],  # top 10 popular
+        'all_tags': Tag.objects.all().order_by('name'),  # fetch all for search/autocomplete later
+        'all_tag_names': list(Tag.objects.order_by('name').values_list('name', flat=True)),  # for JS
+    }
+    return render(request, 'posts/post_form.html', context)
 
 
 @login_required
@@ -324,70 +343,79 @@ def post_toggle_like(request, pk):
 
 @login_required
 def user_manage_posts(request):
-	posts = Post.objects.filter(author=request.user).select_related('category').prefetch_related('comments', 'likes', 'tags')
-	
-	# Search functionality
-	search_query = request.GET.get('q', '').strip()
-	if search_query:
-		posts = posts.filter(
-			Q(title__icontains=search_query) | 
-			Q(content__icontains=search_query)
-		)
-	
-	# Filter by category
-	category_id = request.GET.get('category', '')
-	if category_id:
-		try:
-			posts = posts.filter(category_id=int(category_id))
-		except (ValueError, TypeError):
-			pass
-	
-	# Filter by status
-	status_filter = request.GET.get('status', '')
-	if status_filter in ['draft', 'published']:
-		posts = posts.filter(status=status_filter)
-	
-	# Filter by date range
-	date_range = request.GET.get('date_range', '')
-	if date_range:
-		today = datetime.now().date()
-		if date_range == 'today':
-			posts = posts.filter(created_at__date=today)
-		elif date_range == 'week':
-			start_date = today - timedelta(days=7)
-			posts = posts.filter(created_at__date__gte=start_date)
-		elif date_range == 'month':
-			start_date = today - timedelta(days=30)
-			posts = posts.filter(created_at__date__gte=start_date)
-		elif date_range == 'year':
-			start_date = today - timedelta(days=365)
-			posts = posts.filter(created_at__date__gte=start_date)
-	
-	# Ordering
-	order_by = request.GET.get('order_by', '-created_at')
-	if order_by in ['-created_at', 'created_at', '-updated_at', 'updated_at', 'title']:
-		posts = posts.order_by(order_by)
-	else:
-		posts = posts.order_by('-created_at')
-	
-	categories = Category.objects.all().order_by('name')
-	# Sidebar context
-	from posts.models import Comment, Like, Post as PostModel
-	my_comments = Comment.objects.filter(author=request.user).select_related('post').order_by('-created_at')[:5]
-	liked_post_ids = Like.objects.filter(user=request.user).order_by('-created_at').values_list('post_id', flat=True)[:5]
-	liked_posts = PostModel.objects.filter(id__in=liked_post_ids)
-	context = {
-		'posts': posts,
-		'categories': categories,
-		'search_query': search_query,
-		'selected_category': category_id,
-		'selected_status': status_filter,
-		'selected_date_range': date_range,
-		'selected_order': order_by,
-		'my_comments': my_comments,
-		'liked_posts': liked_posts,
-	}
-	return render(request, 'users/profile_posts.html', context)
+    posts = Post.objects.filter(author=request.user).select_related('category').prefetch_related('comments', 'likes', 'tags')
+    
+    # Search functionality
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        posts = posts.filter(
+            Q(title__icontains=search_query) | 
+            Q(content__icontains=search_query)
+        )
+    
+    # Filter by category
+    category_id = request.GET.get('category', '')
+    if category_id:
+        try:
+            posts = posts.filter(category_id=int(category_id))
+        except (ValueError, TypeError):
+            pass
+    
+    # Filter by status
+    status_filter = request.GET.get('status', '')
+    if status_filter in ['draft', 'published']:
+        posts = posts.filter(status=status_filter)
+    
+    # Filter by date range
+    date_range = request.GET.get('date_range', '')
+    if date_range:
+        today = datetime.now().date()
+        if date_range == 'today':
+            posts = posts.filter(created_at__date=today)
+        elif date_range == 'week':
+            start_date = today - timedelta(days=7)
+            posts = posts.filter(created_at__date__gte=start_date)
+        elif date_range == 'month':
+            start_date = today - timedelta(days=30)
+            posts = posts.filter(created_at__date__gte=start_date)
+        elif date_range == 'year':
+            start_date = today - timedelta(days=365)
+            posts = posts.filter(created_at__date__gte=start_date)
+    
+    # Ordering
+    order_by = request.GET.get('order_by', '-created_at')
+    if order_by in ['-created_at', 'created_at', '-updated_at', 'updated_at', 'title']:
+        posts = posts.order_by(order_by)
+    else:
+        posts = posts.order_by('-created_at')
+    
+    # Pagination: 10 posts per page
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(posts, 10)
+    page_obj = paginator.get_page(page_number)
+    
+    # Categories for filter dropdown
+    categories = Category.objects.all().order_by('name')
+    
+    # Sidebar context
+    my_comments = Comment.objects.filter(author=request.user).select_related('post').order_by('-created_at')[:5]
+    liked_post_ids = Like.objects.filter(user=request.user).order_by('-created_at').values_list('post_id', flat=True)[:5]
+    liked_posts = Post.objects.filter(id__in=liked_post_ids)
+    
+    context = {
+        'posts': page_obj,  # paginated posts
+        'paginator': paginator,
+        'page_obj': page_obj,
+        'categories': categories,
+        'search_query': search_query,
+        'selected_category': category_id,
+        'selected_status': status_filter,
+        'selected_date_range': date_range,
+        'selected_order': order_by,
+        'my_comments': my_comments,
+        'liked_posts': liked_posts,
+    }
+    return render(request, 'users/profile_posts.html', context)
 
 @login_required
 @require_POST
@@ -401,14 +429,13 @@ def delete_post(request, pk):
 	messages.success(request, 'Post deleted successfully!')
 	return redirect('admin_posts' if request.user.is_staff else 'profile')
 
-
 @login_required
 def admin_posts(request):
     if not request.user.is_staff:
         messages.error(request, 'You do not have permission.')
         return redirect('home')
 
-    # Get base queryset
+    # Base queryset
     posts = Post.objects.select_related('author', 'category').prefetch_related('comments', 'likes').order_by('-created_at')
 
     # Filters
@@ -431,10 +458,20 @@ def admin_posts(request):
 
     categories = Category.objects.all().order_by('name')
 
+    # Pagination: 15 posts per page
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(posts, 15)
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'posts': posts,
+        'posts': page_obj,
         'categories': categories,
-        'request': request  # so template can access request.GET
+        'search_query': search_query,
+        'selected_category': category_id,
+        'selected_status': status,
+        'paginator': paginator,
+        'page_obj': page_obj,
+        'request': request  # for template GET access
     }
     return render(request, 'admin/posts.html', context)
 
@@ -482,18 +519,22 @@ def admin_comments(request):
 
     posts = Post.objects.all().order_by('title')
 
+    # Pagination: 15 comments per page
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(comments, 15)
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'comments': comments,
+        'comments': page_obj,
         'posts': posts,
         'user_search': user_search,
         'selected_post': post_id,
         'selected_date_range': date_range,
+        'paginator': paginator,
+        'page_obj': page_obj,
     }
 
     return render(request, 'admin/comments.html', context)
-
-
-@login_required
 
 
 @login_required
@@ -546,13 +587,32 @@ def admin_settings(request):
 
 @login_required
 def admin_categories(request):
-	if not request.user.is_staff:
-		messages.error(request, 'You do not have permission.')
-		return redirect('home')
-	
-	categories = Category.objects.annotate(post_count=Count('posts')).order_by('-created_at')
-	context = {'categories': categories}
-	return render(request, 'admin/categories.html', context)
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission.')
+        return redirect('home')
+
+    # Get search query and page number
+    category_search = request.GET.get('category_search', '').strip()
+    page_number = request.GET.get('page', 1)
+
+    # Base queryset with post count
+    categories = Category.objects.annotate(post_count=Count('posts')).order_by('-created_at')
+
+    # Apply search filter
+    if category_search:
+        categories = categories.filter(name__icontains=category_search)
+
+    # Pagination: 15 categories per page
+    paginator = Paginator(categories, 15)
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'categories': page_obj,
+        'category_search': category_search,
+        'paginator': paginator,
+        'page_obj': page_obj,
+    }
+    return render(request, 'admin/categories.html', context)
 
 
 @login_required
@@ -591,22 +651,44 @@ def admin_delete_category(request, pk):
 	return redirect('admin_categories')
 
 def tag_posts(request, pk):
-	tag = get_object_or_404(Tag, pk=pk)
-	posts = Post.objects.filter(tags=tag, status=Post.STATUS_PUBLISHED).select_related('author', 'category').order_by('-created_at')
-	context = {
-		'tag': tag,
-		'posts': posts,
-	}
-	return render(request, 'pages/tag_posts.html', context)
+    tag = get_object_or_404(Tag, pk=pk)
+    
+    posts = Post.objects.filter(
+        tags=tag, 
+        status=Post.STATUS_PUBLISHED
+    ).select_related('author', 'category').order_by('-created_at')
+    
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        posts = posts.filter(title__icontains=search_query)
+    
+    context = {
+        'tag': tag,
+        'posts': posts,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'pages/tag_posts.html', context)
 
 def category_posts(request, pk):
-	category = get_object_or_404(Category, pk=pk)
-	posts = Post.objects.filter(category=category, status=Post.STATUS_PUBLISHED).select_related('author').order_by('-created_at')
-	context = {
-		'category': category,
-		'posts': posts,
-	}
-	return render(request, 'pages/category_posts.html', context)
+    category = get_object_or_404(Category, pk=pk)
+    
+    posts = Post.objects.filter(
+        category=category,
+        status=Post.STATUS_PUBLISHED
+    ).select_related('author').order_by('-created_at')
+    
+    search_query = request.GET.get('q', '').strip() 
+    if search_query:
+        posts = posts.filter(title__icontains=search_query)
+    
+    context = {
+        'category': category,
+        'posts': posts,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'pages/category_posts.html', context)
 
 def admin_delete_comment(request, pk):
 	if not request.user.is_staff:

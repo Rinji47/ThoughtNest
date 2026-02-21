@@ -35,7 +35,11 @@
             </form>
 
             {% if likes %}
-                <p class="posts-found-count">Found <strong>{{ likes.count }}</strong> liked post{% if likes.count != 1 %}s{% endif %}</p>
+                <!-- Showing count -->
+                <p class="posts-found-count">
+                    Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} liked post{% if page_obj.paginator.count != 1 %}s{% endif %}
+                </p>
+
                 <div class="user-posts-grid">
                     {% for like in likes %}
                     {% with post=like.post %}
@@ -60,6 +64,34 @@
                     {% endwith %}
                     {% endfor %}
                 </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav class="pagination-container">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                        <li><a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}">&laquo; Previous</a></li>
+                        {% else %}
+                        <li class="disabled">&laquo; Previous</li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if num == page_obj.number %}
+                                <li class="active">{{ num }}</li>
+                            {% elif num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+                                <li><a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}">Next &raquo;</a></li>
+                        {% else %}
+                        <li class="disabled">Next &raquo;</li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
             {% else %}
                 <div class="posts-empty-state">
                     <i class="fa-solid fa-heart no-comments-icon"></i>

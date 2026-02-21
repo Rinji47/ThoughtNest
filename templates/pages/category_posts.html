@@ -1,55 +1,72 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Posts in {{ category.name }} {% endblock %}
+{% block title %}Posts in {{ category.name }}{% endblock %}
 
-            <!-- featured_image removed -->
-    <h1 class="page-title">Posts in {{ category.name }}</h1>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Page Title and Search Bar -->
+    <div class="page-header" style="display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem;">
+        <h1 class="page-title">Posts in {{ category.name }}</h1>
+
+        <!-- Search Form -->
+        <form method="get" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <input type="text" 
+                   name="q" 
+                   placeholder="Search posts by title..." 
+                   value="{{ search_query }}" 
+                   style="flex:1; padding:0.7rem 1rem; font-size:1rem; border-radius:12px; border:1px solid #ddd; background:#fff;">
+            <button type="submit" style="padding:0.7rem 1.2rem; font-size:1rem; background:#7a5642; color:#fff; border:none; border-radius:12px; cursor:pointer;">
+                <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+            {% if search_query %}
+            <a href="{% url 'category_posts' category.pk %}" style="padding:0.7rem 1.2rem; font-size:1rem; background:#ccc; color:#333; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:0.3rem;">
+                <i class="fa-solid fa-redo"></i> Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
 
     {% if posts %}
     <div class="posts-grid">
         {% for post in posts %}
-        <article class="post-card">
-
+        <div class="post-card">
             <div class="post-content">
                 <span class="post-category">
-                    {{ category.name }}
+                    {% if post.category %}{{ post.category.name }}{% else %}Uncategorized{% endif %}
                 </span>
-
                 <h3 class="post-title">{{ post.title }}</h3>
-
-                <p class="post-excerpt">
-                    {{ post.content|truncatewords:20 }}
-                </p>
-
+                <p class="post-excerpt">{{ post.content|truncatewords:20 }}</p>
                 <div class="post-meta">
-                    <span>
-                        <i class="fa-regular fa-user"></i>
-                        {{ post.author.get_full_name|default:post.author.username }}
-                    </span>
-                    <span>
-                        <i class="fa-regular fa-calendar"></i>
-                        {{ post.created_at|date:"M d, Y" }}
-                    </span>
+                    <span><i class="fa-regular fa-user"></i> {{ post.author.get_full_name|default:post.author.username }}</span>
+                    <span><i class="fa-regular fa-calendar"></i> {{ post.created_at|date:"M d, Y" }}</span>
                 </div>
-
                 <div class="post-footer">
                     <a href="{% url 'post_detail' post.pk %}" class="read-more">
                         Read More <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
-
-        </article>
+        </div>
         {% endfor %}
     </div>
     {% else %}
     <div class="empty-state">
         <i class="fa-regular fa-folder-open empty-state-icon"></i>
         <p class="empty-state-text">
-            No posts found in this category.
+            {% if search_query %}
+                No posts found matching your search.
+            {% else %}
+                No posts found in this category.
+            {% endif %}
         </p>
     </div>
     {% endif %}
+
 </div>
 {% endblock %}

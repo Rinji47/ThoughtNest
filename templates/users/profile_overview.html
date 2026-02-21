@@ -39,20 +39,9 @@
                 </div>
             </div>
 
-            <!-- User Bio and Info -->
-            <div class="profile-bio-info" style="margin: 2.5rem 0 1.5rem 0; padding: 1.5rem 2rem; background: #fffaf5; border-radius: 18px; box-shadow: 0 2px 8px rgba(107,75,62,0.06);">
-                <h2 style="font-size: 1.3rem; color: var(--primary-color); margin-bottom: 0.7rem;">About Me</h2>
-                <p style="margin-bottom: 0.5rem; color: #6c6156;">{{ request.user.profile.bio|default:'No bio yet.' }}</p>
-                <div style="display: flex; gap: 2.5rem; flex-wrap: wrap; color: #8b6f47; font-size: 1.05rem;">
-                    {% if request.user.profile.location %}<span><i class="fa-solid fa-location-dot"></i> {{ request.user.profile.location }}</span>{% endif %}
-                    {% if request.user.profile.website %}<span><i class="fa-solid fa-link"></i> <a href="{{ request.user.profile.website }}" target="_blank" style="color: #8b6f47; text-decoration: underline;">Website</a></span>{% endif %}
-                </div>
-                <a href="{% url 'profile_settings' %}" class="btn-edit" style="margin-top: 1.2rem; display: inline-block;"><i class="fa-solid fa-pen-to-square"></i> Edit Profile</a>
-            </div>
-
             <!-- Recent Comments -->
             <div style="margin-bottom: 2.5rem;">
-                <h2 style="font-size: 1.15rem; color: var(--primary-color); margin-bottom: 0.7rem;">Recent Comments</h2>
+                <h2 style="font-size: 1.15rem;color: var(--primary-color);margin-bottom: 0.7rem;margin-top: 30px;">Recent Comments</h2>
                 {% if my_comments %}
                 <ul style="list-style: none; padding: 0; margin: 0;">
                     {% for comment in my_comments %}

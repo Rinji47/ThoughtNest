@@ -23,32 +23,34 @@
                 {% endfor %}
             </div>
         {% endif %}
+
         <!-- Modern Filter/Search Box -->
         <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem 1.5rem 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
             <div style="display: flex; flex-direction: column; gap: 1.1rem;">
-                <input type="text" name="search" placeholder="Search posts titles, usernames or name..." value="{{ request.GET.search }}" style="border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.9rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+                <input type="text" name="search" placeholder="Search posts titles, usernames or name..." value="{{ search_query }}" style="border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.9rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                 <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
                     <select name="category" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                         <option value="">All Categories</option>
                         {% for category in categories %}
-                            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
+                            <option value="{{ category.id }}" {% if selected_category|stringformat:'s' == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
                         {% endfor %}
                     </select>
                     <select name="status" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                         <option value="">All Statuses</option>
-                        <option value="published" {% if request.GET.status == 'published' %}selected{% endif %}>Published</option>
-                        <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="published" {% if selected_status == 'published' %}selected{% endif %}>Published</option>
+                        <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>Draft</option>
                     </select>
                 </div>
                 <div style="margin-top: 0.5rem;">
                     <button type="submit" class="btn-filter" style="background: #7a5642; color: #fff; border-radius: 10px; padding: 0.7rem 1.7rem; font-weight: 600; font-size: 1.08rem; border: none; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-magnifying-glass"></i> Apply</button>
-                    {% if request.GET.search or request.GET.author or request.GET.category or request.GET.status %}
+                    {% if search_query or selected_category or selected_status %}
                         <a href="{% url 'admin_posts' %}" class="btn-filter btn-filter-clear" style="margin-left: 0.7rem;"><i class="fa-solid fa-redo"></i> Clear</a>
                     {% endif %}
                 </div>
             </div>
         </form>
 
+        <!-- Posts Table -->
         <table class="admin-table">
             <thead>
                 <tr>
@@ -84,13 +86,30 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8">No posts yet.</td>
+                    <td colspan="9">No posts found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="margin-top: 1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+            {% if page_obj.has_previous %}
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}page={{ page_obj.previous_page_number }}" class="btn-pagination">&laquo; Previous</a>
+            {% endif %}
+
+            <span class="current-page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}page={{ page_obj.next_page_number }}" class="btn-pagination">Next &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}

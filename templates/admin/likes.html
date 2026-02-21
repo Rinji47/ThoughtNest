@@ -24,10 +24,9 @@
         <!-- Filter/Search Box -->
         <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
             <div style="display: flex; flex-direction: column; gap: 1.1rem;">
-                
                 <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
                     <!-- User Search Bar -->
-                    <input type="text" name="user_search" placeholder="Search by username or full name..." value="{{ request.GET.user_search }}" style="flex:1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+                    <input type="text" name="user_search" placeholder="Search by username or full name..." value="{{ user_search }}" style="flex:1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
 
                     <!-- Post Dropdown -->
                     <select name="post" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
@@ -51,7 +50,7 @@
                     <button type="submit" class="btn-filter" style="background: #7a5642; color: #fff; border-radius: 10px; padding: 0.7rem 1.7rem; font-weight: 600; font-size: 1.08rem; border: none; display: inline-flex; align-items: center; gap: 0.5rem;">
                         <i class="fa-solid fa-magnifying-glass"></i> Apply
                     </button>
-                    {% if request.GET.user_search or selected_post or selected_date_range %}
+                    {% if user_search or selected_post or selected_date_range %}
                         <a href="{% url 'admin_likes' %}" class="btn-filter btn-filter-clear" style="margin-left: 0.7rem;">
                             <i class="fa-solid fa-redo"></i> Clear
                         </a>
@@ -80,6 +79,25 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="margin-top:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+            {% if page_obj.has_previous %}
+                <a href="?{% if user_search %}user_search={{ user_search }}&{% endif %}{% if selected_post %}post={{ selected_post }}&{% endif %}{% if selected_date_range %}date_range={{ selected_date_range }}&{% endif %}page={{ page_obj.previous_page_number }}" class="btn-pagination">&laquo; Previous</a>
+            {% endif %}
+
+            <span class="current-page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?{% if user_search %}user_search={{ user_search }}&{% endif %}{% if selected_post %}post={{ selected_post }}&{% endif %}{% if selected_date_range %}date_range={{ selected_date_range }}&{% endif %}page={{ page_obj.next_page_number }}" class="btn-pagination">Next &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin_dashboard.js' %}"></script>
 {% endblock %}

@@ -8,12 +8,10 @@
 {% endblock %}
 
 {% block content %}
-
 <div class="profile-wrapper">
     {% include 'users/profile_sidebar.html' %}
 
     <main class="profile-content">
-        
         {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
@@ -72,7 +70,11 @@
             </form>
 
             {% if posts %}
-                <p class="posts-found-count">Found <strong>{{ posts.count }}</strong> post{% if posts.count != 1 %}s{% endif %}</p>
+                <!-- Showing count -->
+                <p class="posts-found-count">
+                    Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} post{% if page_obj.paginator.count != 1 %}s{% endif %}
+                </p>
+
                 <div class="user-posts-grid">
                     {% for post in posts %}
                     <div class="user-post-card">
@@ -119,6 +121,34 @@
                     </div>
                     {% endfor %}
                 </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav class="pagination-container">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                        <li><a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}{% if selected_order %}&order_by={{ selected_order }}{% endif %}">&laquo; Previous</a></li>
+                        {% else %}
+                        <li class="disabled">&laquo; Previous</li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if num == page_obj.number %}
+                                <li class="active">{{ num }}</li>
+                            {% elif num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+                                <li><a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}{% if selected_order %}&order_by={{ selected_order }}{% endif %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}{% if selected_order %}&order_by={{ selected_order }}{% endif %}">Next &raquo;</a></li>
+                        {% else %}
+                        <li class="disabled">Next &raquo;</li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
             {% else %}
                 <div class="posts-empty-state">
                     <i class="fa-solid fa-feather"></i>
@@ -138,5 +168,4 @@
         </section>
     </main>
 </div>
-
 {% endblock %}

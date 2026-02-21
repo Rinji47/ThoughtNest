@@ -5,6 +5,12 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/categories.css' %}">
+<style>
+    /* Tag search dropdown styling */
+    #tagSearchSuggestions div:hover {
+        background: #e8d6c1;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -24,6 +30,27 @@
         <p class="page-subtitle">Explore posts organized by topics that interest you</p>
     </div>
 
+    <!-- Tag Search -->
+    {% if tags %}
+    {{ all_tags_json|json_script:"allTagsData" }}
+    <div class="tag-search-wrapper" style="margin-bottom:1rem; display:flex; gap:0.5rem; flex-direction:column;">
+        <input type="text" id="tagSearchInput" placeholder="Search tags..." style="padding:0.5rem 0.7rem; border-radius:12px; border:1px solid #ddd; width:100%;">
+        <div id="tagSearchSuggestions" style="position:relative; z-index:10;"></div>
+    </div>
+    {% endif %}
+
+    <!-- Popular Tags -->
+    <section class="tags-section">
+        <h2 class="section-title">Popular Tags</h2>
+        <div class="tags-container">
+            {% for tag in tags %}
+                <a href="{% url 'tag_posts' pk=tag.id %}" class="tag" data-category="{{ tag.id }}">#{{ tag.name }}</a>
+            {% empty %}
+                <p style="color:var(--text-muted);font-size:0.9rem;">No tags yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
     <!-- Categories Grid -->
     <div class="categories-grid">
         {% for category in categories %}
@@ -37,18 +64,6 @@
         <p style="grid-column:1/-1;text-align:center;color:var(--text-muted);">No categories yet.</p>
         {% endfor %}
     </div>
-
-    <!-- Popular Tags -->
-    <section class="tags-section">
-    <h2 class="section-title">Popular Tags</h2>
-        <div class="tags-container">
-            {% for tag in tags %}
-                <a href="{% url 'tag_posts' pk=tag.id %}" class="tag" data-category="{{ tag.id }}">#{{ tag.name }}</a>
-            {% empty %}
-                <p style="color:var(--text-muted);font-size:0.9rem;">No tags yet.</p>
-            {% endfor %}
-        </div>
-    </section>
 
     <!-- Posts by Category Section -->
     <section class="category-posts">
@@ -80,4 +95,50 @@
 
 {% block extra_js %}
 <script src="{% static 'js/categories.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const allTags = JSON.parse(document.getElementById('allTagsData').textContent);
+    const searchInput = document.getElementById('tagSearchInput');
+    const suggestionsContainer = document.getElementById('tagSearchSuggestions');
+
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function () {
+        const query = searchInput.value.toLowerCase().trim();
+        suggestionsContainer.innerHTML = '';
+
+        if (!query) return;
+
+        const matches = allTags.filter(tag => tag.name.toLowerCase().includes(query)).slice(0, 10);
+
+        if (matches.length === 0) {
+            const div = document.createElement('div');
+            div.textContent = "No tags found";
+            div.style.padding = '0.3rem 0.5rem';
+            div.style.color = '#a18f7d';
+            suggestionsContainer.appendChild(div);
+            return;
+        }
+
+        matches.forEach(tag => {
+            const div = document.createElement('div');
+            div.textContent = `#${tag.name}`;
+            div.style.cursor = 'pointer';
+            div.style.padding = '0.3rem 0.5rem';
+            div.style.background = '#fffaf5';
+            div.style.borderBottom = '1px solid #f2e5d7';
+            div.addEventListener('click', () => {
+                window.location.href = `/tag/${tag.id}/posts/`;
+            });
+            suggestionsContainer.appendChild(div);
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!suggestionsContainer.contains(e.target) && e.target !== searchInput) {
+            suggestionsContainer.innerHTML = '';
+        }
+    });
+});
+</script>
 {% endblock %}

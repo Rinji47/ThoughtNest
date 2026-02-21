@@ -62,61 +62,6 @@
                         <input type="text" id="location" name="location" value="{{ profile.location|default:'' }}"
                             class="form-input" placeholder="City, Country">
                     </div>
-                    <div class="form-group">
-                        <label for="website">Website</label>
-                        <input type="url" id="website" name="website" value="{{ profile.website|default:'' }}"
-                            class="form-input" placeholder="https://yoursite.com">
-                    </div>
-                    <div class="form-group" style="grid-column:1/-1;">
-                        <label for="bio">Bio</label>
-                        <textarea id="bio" name="bio" rows="3" class="form-input"
-                            placeholder="A short bio about yourself…"
-                            maxlength="500">{{ profile.bio|default:'' }}</textarea>
-                        <p class="input-hint">Max 500 characters.</p>
-                    </div>
-                </div>
-
-                <h3 class="settings-sub-heading"><i class="fa-brands fa-connectdevelop"></i> Social Links</h3>
-                <div class="settings-form-grid">
-                    <div class="form-group">
-                        <label for="twitter"><i class="fa-brands fa-x-twitter"></i> Twitter / X</label>
-                        <input type="text" id="twitter" name="twitter" value="{{ profile.twitter|default:'' }}"
-                            class="form-input" placeholder="@handle">
-                    </div>
-                    <div class="form-group">
-                        <label for="github"><i class="fa-brands fa-github"></i> GitHub</label>
-                        <input type="text" id="github" name="github" value="{{ profile.github|default:'' }}"
-                            class="form-input" placeholder="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="linkedin"><i class="fa-brands fa-linkedin"></i> LinkedIn</label>
-                        <input type="text" id="linkedin" name="linkedin" value="{{ profile.linkedin|default:'' }}"
-                            class="form-input" placeholder="profile URL or username">
-                    </div>
-                </div>
-
-                <h3 class="settings-sub-heading"><i class="fa-solid fa-bell"></i> Notifications</h3>
-                <div class="profile-toggles">
-                    <label class="toggle-row-sm">
-                        <div class="toggle-info">
-                            <span class="toggle-label">Email Notifications</span>
-                            <span class="toggle-desc">Get notified when someone comments on your post</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" name="email_notifications" {% if profile and profile.email_notifications %}checked{% endif %}>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </label>
-                    <label class="toggle-row-sm">
-                        <div class="toggle-info">
-                            <span class="toggle-label">Newsletter</span>
-                            <span class="toggle-desc">Receive our weekly digest of top posts</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <!-- newsletter_subscription checkbox removed -->
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </label>
                 </div>
 
                 <button type="submit" class="btn-primary" style="margin-top:1.25rem;">

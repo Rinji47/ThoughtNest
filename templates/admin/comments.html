@@ -16,7 +16,7 @@
         {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             </div>
         {% endif %}
@@ -101,6 +101,26 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="margin-top:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+            {% if page_obj.has_previous %}
+                <a href="?{% if user_search %}user_search={{ user_search }}&{% endif %}{% if selected_post %}post={{ selected_post }}&{% endif %}{% if selected_date_range %}date_range={{ selected_date_range }}&{% endif %}page={{ page_obj.previous_page_number }}" class="btn-pagination">&laquo; Previous</a>
+            {% endif %}
+
+            <span class="current-page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?{% if user_search %}user_search={{ user_search }}&{% endif %}{% if selected_post %}post={{ selected_post }}&{% endif %}{% if selected_date_range %}date_range={{ selected_date_range }}&{% endif %}page={{ page_obj.next_page_number }}" class="btn-pagination">Next &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin_dashboard.js' %}"></script>
 {% endblock %}

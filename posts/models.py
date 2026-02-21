@@ -11,7 +11,6 @@ class Category(models.Model):
 		ordering = ['name']
 		verbose_name_plural = 'categories'
 
-	# Removed slug logic
 
 	def __str__(self):
 		return self.name
@@ -24,7 +23,6 @@ class Tag(models.Model):
 	class Meta:
 		ordering = ['name']
 
-	# Removed slug logic
 
 	def __str__(self):
 		return self.name

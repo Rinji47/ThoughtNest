@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Posts tagged {{ tag.name }} {% endblock %}
+{% block title %}Posts tagged {{ tag.name }}{% endblock %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
@@ -9,7 +9,28 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="page-title">Posts tagged {{ tag.name }}</h1>
+
+    <!-- Page Title and Search Bar -->
+    <div class="page-header" style="display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem;">
+        <h1 class="page-title">Posts tagged {{ tag.name }}</h1>
+
+        <!-- Search Form -->
+        <form method="get" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <input type="text"
+                   name="q"
+                   placeholder="Search posts by title..."
+                   value="{{ search_query }}"
+                   style="flex:1; padding:0.7rem 1rem; font-size:1rem; border-radius:12px; border:1px solid #ddd; background:#fff;">
+            <button type="submit" style="padding:0.7rem 1.2rem; font-size:1rem; background:#7a5642; color:#fff; border:none; border-radius:12px; cursor:pointer;">
+                <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+            {% if search_query %}
+            <a href="{% url 'tag_posts' tag.pk %}" style="padding:0.7rem 1.2rem; font-size:1rem; background:#ccc; color:#333; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:0.3rem;">
+                <i class="fa-solid fa-redo"></i> Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
 
     {% if posts %}
     <div class="posts-grid">
@@ -18,7 +39,7 @@
 
             <div class="post-content">
                 <span class="post-category">
-                    {{ post.category.name }}
+                    {% if post.category %}{{ post.category.name }}{% else %}Uncategorized{% endif %}
                 </span>
 
                 <h3 class="post-title">{{ post.title }}</h3>
@@ -52,9 +73,14 @@
     <div class="empty-state">
         <i class="fa-regular fa-folder-open empty-state-icon"></i>
         <p class="empty-state-text">
-            No posts found with this tag.
+            {% if search_query %}
+                No posts found matching your search.
+            {% else %}
+                No posts found with this tag.
+            {% endif %}
         </p>
     </div>
     {% endif %}
+
 </div>
 {% endblock %}

@@ -58,7 +58,7 @@
             <select id="categoryFilter" class="filter-select">
                 <option value="">All Categories</option>
                 {% for category in categories %}
-                <option value="{{ category.slug }}">{{ category.name }}</option>
+                <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -68,7 +68,7 @@
            {% if latest_posts %}
                 {% for post in latest_posts %}
                     <article class="post-card" data-title="{{ post.title|lower }}"
-                        data-category="{{ post.category.slug|default:'' }}">
+                        data-category="{{ post.category.id|default:'' }}">
                         <div class="post-content">
                             {% if post.category %}
                                 <span class="post-category">{{ post.category.name }}</span>
