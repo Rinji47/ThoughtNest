@@ -1,0 +1,3 @@
+posts/post_form.html: Could not parse the remainder: '==category.id' from 'post.category_id==category.id'
+users/profile_settings.html: Invalid block tag on line 120: 'endif', expected 'endblock'. Did you forget to register or load this tag?
+admin/settings.html: Invalid block tag on line 108: 'endif', expected 'endblock'. Did you forget to register or load this tag?

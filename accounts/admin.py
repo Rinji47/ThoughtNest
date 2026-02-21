@@ -11,7 +11,7 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile'
     fields = ('bio', 'avatar', 'location', 'website', 'twitter', 'github', 'linkedin', 
-              'email_notifications', 'newsletter_subscription')
+              'email_notifications',)
 
 
 class UserAdmin(BaseUserAdmin):
@@ -29,8 +29,8 @@ admin.site.register(User, UserAdmin)
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     """Admin interface for UserProfile"""
-    list_display = ('user', 'location', 'created_at', 'email_notifications', 'newsletter_subscription')
-    list_filter = ('email_notifications', 'newsletter_subscription', 'created_at')
+    list_display = ('user', 'location', 'created_at', 'email_notifications')
+    list_filter = ('email_notifications', 'created_at')
     search_fields = ('user__username', 'user__email', 'bio', 'location')
     readonly_fields = ('created_at', 'updated_at')
     
@@ -43,7 +43,7 @@ class UserProfileAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Preferences', {
-            'fields': ('email_notifications', 'newsletter_subscription')
+            'fields': ('email_notifications',)
         }),
         ('Metadata', {
             'fields': ('created_at', 'updated_at'),

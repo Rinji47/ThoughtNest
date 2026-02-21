@@ -1,10 +1,7 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% load static %}
 
-
-
 {% block title %}Manage Likes - Admin{% endblock %}
-
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/admin.css' %}">
@@ -15,21 +12,32 @@
     {% include 'admin/sidebar.html' %}
     <div class="admin-content">
         <h1>Likes Management</h1>
-        <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem 1.5rem 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
+
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Filter/Search Box -->
+        <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
             <div style="display: flex; flex-direction: column; gap: 1.1rem;">
+                
                 <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
-                    <select name="user" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
-                        <option value="">All Users</option>
-                        {% for user in users %}
-                            <option value="{{ user.id }}" {% if selected_user|stringformat:'s' == user.id|stringformat:'s' %}selected{% endif %}>{{ user.username }}</option>
-                        {% endfor %}
-                    </select>
+                    <!-- User Search Bar -->
+                    <input type="text" name="user_search" placeholder="Search by username or full name..." value="{{ request.GET.user_search }}" style="flex:1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+
+                    <!-- Post Dropdown -->
                     <select name="post" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                         <option value="">All Posts</option>
                         {% for post in posts %}
                             <option value="{{ post.id }}" {% if selected_post|stringformat:'s' == post.id|stringformat:'s' %}selected{% endif %}>{{ post.title|truncatechars:30 }}</option>
                         {% endfor %}
                     </select>
+
+                    <!-- Date Range -->
                     <select name="date_range" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                         <option value="">All Time</option>
                         <option value="today" {% if selected_date_range == 'today' %}selected{% endif %}>Today</option>
@@ -38,14 +46,20 @@
                         <option value="year" {% if selected_date_range == 'year' %}selected{% endif %}>Last Year</option>
                     </select>
                 </div>
+
                 <div style="margin-top: 0.5rem;">
-                    <button type="submit" class="btn-filter" style="background: #7a5642; color: #fff; border-radius: 10px; padding: 0.7rem 1.7rem; font-weight: 600; font-size: 1.08rem; border: none; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-magnifying-glass"></i> Apply</button>
-                    {% if selected_user or selected_post or selected_date_range %}
-                        <a href="{% url 'admin_likes' %}" class="btn-filter btn-filter-clear" style="margin-left: 0.7rem;"><i class="fa-solid fa-redo"></i> Clear</a>
+                    <button type="submit" class="btn-filter" style="background: #7a5642; color: #fff; border-radius: 10px; padding: 0.7rem 1.7rem; font-weight: 600; font-size: 1.08rem; border: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-magnifying-glass"></i> Apply
+                    </button>
+                    {% if request.GET.user_search or selected_post or selected_date_range %}
+                        <a href="{% url 'admin_likes' %}" class="btn-filter btn-filter-clear" style="margin-left: 0.7rem;">
+                            <i class="fa-solid fa-redo"></i> Clear
+                        </a>
                     {% endif %}
                 </div>
             </div>
         </form>
+
         <table class="admin-table">
             <thead>
                 <tr>
@@ -57,7 +71,7 @@
             <tbody>
                 {% for like in likes %}
                 <tr>
-                    <td>{{ like.user.username }}</td>
+                    <td>{{ like.user.get_full_name|default:like.user.username }}</td>
                     <td><a href="{% url 'post_detail' like.post.pk %}">{{ like.post.title|truncatechars:40 }}</a></td>
                     <td>{{ like.created_at|date:"M d, Y H:i" }}</td>
                 </tr>

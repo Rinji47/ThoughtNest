@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% load static %}
 
 {% block title %}Manage Posts - Admin{% endblock %}
@@ -26,14 +26,8 @@
         <!-- Modern Filter/Search Box -->
         <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem 1.5rem 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
             <div style="display: flex; flex-direction: column; gap: 1.1rem;">
-                <input type="text" name="search" placeholder="Search posts..." value="{{ request.GET.search }}" style="border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.9rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+                <input type="text" name="search" placeholder="Search posts titles, usernames or name..." value="{{ request.GET.search }}" style="border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.9rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                 <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
-                    <select name="author" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
-                        <option value="">All Authors</option>
-                        {% for user in users %}
-                            <option value="{{ user.id }}" {% if request.GET.author == user.id|stringformat:'s' %}selected{% endif %}>{{ user.username }}</option>
-                        {% endfor %}
-                    </select>
                     <select name="category" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                         <option value="">All Categories</option>
                         {% for category in categories %}
@@ -60,6 +54,7 @@
                 <tr>
                     <th>Title</th>
                     <th>Author</th>
+                    <th>Username</th>
                     <th>Category</th>
                     <th>Status</th>
                     <th>Likes</th>
@@ -73,6 +68,7 @@
                 <tr>
                     <td><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></td>
                     <td>{{ post.author.get_full_name|default:post.author.username }}</td>
+                    <td>{{ post.author.username }}</td>
                     <td>{% if post.category %}{{ post.category.name }}{% else %}Uncategorized{% endif %}</td>
                     <td><span class="status-badge published">{{ post.get_status_display }}</span></td>
                     <td>{{ post.likes.count }}</td>

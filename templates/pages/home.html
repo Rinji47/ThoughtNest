@@ -9,31 +9,52 @@
 
 {% block content %}
 {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
+<div class="messages-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
     </div>
+    {% endfor %}
+</div>
 {% endif %}
 
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-content">
-        <h1 class="hero-title">Welcome to ThoughtNest</h1>
-        <p class="hero-subtitle">Gather ideas, grow perspectives, and share what matters.</p>
+        <span class="hero-eyebrow">✦ Welcome to ThoughtNest</span>
+        <h1 class="hero-title">Where ideas find their <em>home</em></h1>
+        <p class="hero-subtitle">A cozy corner to gather thoughts, share perspectives, and connect with curious minds.
+        </p>
+        {% if user.is_authenticated %}
+        <div class="hero-actions">
+            <a href="{% url 'post_create' %}" class="btn-hero-primary">
+                <i class="fa-solid fa-pen-nib"></i> Write a Post
+            </a>
+            <a href="/categories" class="btn-hero-secondary">
+                <i class="fa-solid fa-compass"></i> Explore Categories
+            </a>
+        </div>
+        {% else %}
+        <div class="hero-actions">
+            <a href="{% url 'register' %}" class="btn-hero-primary">
+                <i class="fa-solid fa-feather"></i> Get Started Free
+            </a>
+            <a href="{% url 'login' %}" class="btn-hero-secondary">
+                Sign In
+            </a>
+        </div>
+        {% endif %}
     </div>
 </section>
 
 <!-- Main Posts Section -->
 <section class="posts-section" id="posts">
     <div class="container">
-        <h2 class="section-title">Latest Posts</h2>
-        
+        <h2 class="section-title">Latest <span>Posts</span></h2>
+
         <!-- Search & Filter -->
         <div class="search-filter">
-            <input type="text" id="searchInput" class="search-box" placeholder="Search posts by title or keyword...">
+            <input type="text" id="searchInput" class="search-box" placeholder="Search posts…">
             <select id="categoryFilter" class="filter-select">
                 <option value="">All Categories</option>
                 {% for category in categories %}
@@ -44,53 +65,58 @@
 
         <!-- Posts Grid -->
         <div class="posts-grid" id="postsContainer">
-            {% if latest_posts %}
+           {% if latest_posts %}
                 {% for post in latest_posts %}
-                <article class="post-card">
-                    {% if post.featured_image %}
-                    <div class="image-wrapper">
-                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="post-image">
-                    </div>
-                    {% endif %}
-                    <div class="post-content">
-                        {% if post.category %}
-                        <span class="post-category">{{ post.category.name }}</span>
-                        {% endif %}
-                        <h3 class="post-title">{{ post.title }}</h3>
-                        <p class="post-excerpt">{{ post.content|truncatewords:30 }}</p>
-                        <div class="post-meta">
-                            <span>By {{ post.author.get_full_name|default:post.author.username }}</span>
-                            <span>{{ post.created_at|date:"M d, Y" }}</span>
-                        </div>
-                        <div class="post-footer">
-                            {% if user.is_authenticated %}
-                            <form method="post" action="{% url 'post_toggle_like' post.pk %}" class="post-like-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.path }}">
-                                <button type="submit" class="post-likes-btn {% if post.user_has_liked %}liked{% endif %}" data-id="{{ post.pk }}">
-                                    <i class="fa-solid fa-heart"></i> {{ post.likes.count }} likes
-                                </button>
-                            </form>
-                            {% else %}
-                            <a href="{% url 'login' %}" class="post-likes-btn">
-                                <i class="fa-solid fa-heart"></i> {{ post.likes.count }} likes
-                            </a>
+                    <article class="post-card" data-title="{{ post.title|lower }}"
+                        data-category="{{ post.category.slug|default:'' }}">
+                        <div class="post-content">
+                            {% if post.category %}
+                                <span class="post-category">{{ post.category.name }}</span>
                             {% endif %}
-                            <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More →</a>
+                            <h3 class="post-title">{{ post.title }}</h3>
+                            <p class="post-excerpt">{{ post.content|truncatewords:site_settings.excerpt_length }}</p>
+                            <div class="post-meta">
+                                {% if site_settings.show_author %}
+                                    <span><i class="fa-regular fa-user"></i> 
+                                        {{ post.author.get_full_name|default:post.author.username }}
+                                    </span>
+                                {% endif %}
+                                <span><i class="fa-regular fa-calendar"></i> {{ post.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="post-footer">
+                                {% if user.is_authenticated %}
+                                    <form method="post" action="{% url 'post_toggle_like' post.pk %}" class="post-like-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <button type="submit" class="post-likes-btn {% if post.user_has_liked %}liked{% endif %}"
+                                            data-id="{{ post.pk }}">
+                                            <i class="fa-solid fa-heart"></i>
+                                            {{ post.likes.count }}
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'login' %}" class="post-likes-btn">
+                                        <i class="fa-regular fa-heart"></i> {{ post.likes.count }}
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More <i
+                                        class="fa-solid fa-arrow-right"></i></a>
+                            </div>
                         </div>
-                    </div>
-                </article>
+                    </article>
                 {% endfor %}
             {% else %}
-            <div class="empty-state">
-                <i class="fa-solid fa-inbox empty-state-icon"></i>
-                <p class="empty-state-text">No posts yet. Check back soon!</p>
-            </div>
+                <div class="empty-state">
+                    <i class="fa-regular fa-newspaper empty-state-icon"></i>
+                    <p class="empty-state-text">No posts yet. Be the first to share your thoughts!</p>
+                </div>
             {% endif %}
         </div>
 
         <div id="noResults" class="no-results">
-            <p>No posts found. Try adjusting your search or filter.</p>
+            <i class="fa-solid fa-magnifying-glass"
+                style="font-size:2rem;color:var(--border-strong);display:block;margin-bottom:1rem;"></i>
+            <p>No posts found. Try a different search or category.</p>
         </div>
     </div>
 </section>

@@ -1,30 +1,177 @@
-{% extends "base.html" %}
+﻿{% extends "base_dashboard.html" %}
 {% load static %}
 
-{% block title %}Admin Settings{% endblock %}
+{% block title %}Admin Settings - ThoughtNest{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin_settings.css' %}">
 {% endblock %}
 
 {% block content %}
-
-
 <div class="admin-wrapper">
     {% include 'admin/sidebar.html' %}
     <div class="admin-content">
+
         {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        <div class="settings-box">
-            <p>Settings management coming soon.</p>
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
         </div>
+        {% endif %}
+
+        <div class="admin-header">
+            <div>
+                <h1>Site Settings</h1>
+                <p style="color:var(--text-muted);margin:0;font-size:0.9rem;">Configure your ThoughtNest site
+                    preferences</p>
+            </div>
+        </div>
+
+        <!-- Site Info -->
+        <div class="settings-section">
+            <div class="settings-section__header">
+                <i class="fa-solid fa-globe"></i>
+                <div>
+                    <h2>Site Information</h2>
+                    <p>Basic details about your site</p>
+                </div>
+            </div>
+            <form method="post" action="{% url 'admin_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="site_info">
+                <div class="settings-form-grid">
+                    <div class="form-group">
+                        <label for="site_name">Site Name</label>
+                        <input type="text" id="site_name" name="site_name"
+                            value="{{ site_settings.site_name|default:'ThoughtNest' }}" class="form-input"
+                            placeholder="ThoughtNest">
+                    </div>
+                    <div class="form-group">
+                        <label for="site_tagline">Tagline</label>
+                        <input type="text" id="site_tagline" name="site_tagline"
+                            value="{{ site_settings.site_tagline|default:'Gather ideas. Grow perspectives.' }}"
+                            class="form-input" placeholder="Short tagline">
+                    </div>
+                    <div class="form-group" style="grid-column: 1/-1;">
+                        <label for="site_description">Description</label>
+                        <textarea id="site_description" name="site_description" rows="3" class="form-input"
+                            placeholder="A brief description of your site...">{{ site_settings.site_description|default:'' }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_email">Contact Email</label>
+                        <input type="email" id="contact_email" name="contact_email"
+                            value="{{ site_settings.contact_email|default:'' }}" class="form-input"
+                            placeholder="admin@example.com">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary settings-save-btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Site Info
+                </button>
+            </form>
+        </div>
+
+        <!-- Content Settings -->
+        <div class="settings-section">
+            <div class="settings-section__header">
+                <i class="fa-solid fa-sliders"></i>
+                <div>
+                    <h2>Content Settings</h2>
+                    <p>Control how content is handled on your site</p>
+                </div>
+            </div>
+            <form method="post" action="{% url 'admin_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="content_settings">
+                <div class="settings-form-grid">
+                    <div class="form-group">
+                        <label for="posts_per_page">Posts per Page</label>
+                        <input type="number" id="posts_per_page" name="posts_per_page"
+                            value="{{ site_settings.posts_per_page|default:'12' }}" min="1" max="50" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="excerpt_length">Excerpt Length (words)</label>
+                        <input type="number" id="excerpt_length" name="excerpt_length"
+                            value="{{ site_settings.excerpt_length|default:'25' }}" min="10" max="100"
+                            class="form-input">
+                    </div>
+                </div>
+                <div class="settings-toggles">
+                    <label class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Allow Comments</span>
+                            <span class="toggle-desc">Let readers comment on posts</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="allow_comments" {% if site_settings.allow_comments %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                    <label class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Moderate Comments</span>
+                            <span class="toggle-desc">Review comments before they appear</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="moderate_comments" {% if site_settings.moderate_comments %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                    <label class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Allow User Registration</span>
+                            <span class="toggle-desc">Let new users create accounts</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="allow_registration" {% if site_settings.allow_registration %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                    <label class="toggle-row">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Show Author Names</span>
+                            <span class="toggle-desc">Display author on post cards</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="show_author" {% if site_settings.show_author %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                </div>
+                <button type="submit" class="btn-primary settings-save-btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Content Settings
+                </button>
+            </form>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-section settings-section--danger">
+            <div class="settings-section__header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <h2>Danger Zone</h2>
+                    <p>Irreversible and destructive actions</p>
+                </div>
+            </div>
+            <div class="danger-items">
+                <div class="danger-item">
+                    <div>
+                        <strong>Clear All Comments</strong>
+                        <p>Permanently delete all comments from all posts. This cannot be undone.</p>
+                    </div>
+                    <form method="post" action="{% url 'admin_settings' %}"
+                        onsubmit="return confirm('Delete ALL comments? This cannot be undone.');">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="clear_comments">
+                        <button type="submit" class="btn-danger-sm">
+                            <i class="fa-solid fa-trash"></i> Clear Comments
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

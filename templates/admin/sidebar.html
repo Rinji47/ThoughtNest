@@ -10,9 +10,10 @@
             <li>{% url 'admin_posts' as posts_url %}<a href="{{ posts_url }}" class="sidebar-link {% if request.path == posts_url %}active{% endif %}"><i class="fa-solid fa-pen-nib"></i> Posts</a></li>
             <li>{% url 'admin_comments' as comments_url %}<a href="{{ comments_url }}" class="sidebar-link {% if request.path == comments_url %}active{% endif %}"><i class="fa-solid fa-comment"></i> Comments</a></li>
             <li>{% url 'admin_likes' as likes_url %}<a href="{{ likes_url }}" class="sidebar-link {% if request.path == likes_url %}active{% endif %}"><i class="fa-solid fa-heart"></i> Likes</a></li>
-            <li>{% url 'admin_subscribers' as subs_url %}<a href="{{ subs_url }}" class="sidebar-link {% if request.path == subs_url %}active{% endif %}"><i class="fa-solid fa-envelope"></i> Subscribers</a></li>
+            <li>{% url 'admin_users_manage' as users_url %}<a href="{{ users_url }}" class="sidebar-link {% if request.path == users_url %}active{% endif %}"><i class="fa-solid fa-users"></i> Users</a></li>
             <li>{% url 'admin_settings' as settings_url %}<a href="{{ settings_url }}" class="sidebar-link {% if request.path == settings_url %}active{% endif %}"><i class="fa-solid fa-gear"></i> Settings</a></li>
             <li>{% url 'admin_categories' as cats_url %}<a href="{{ cats_url }}" class="sidebar-link {% if request.path == cats_url %}active{% endif %}"><i class="fa-solid fa-folder"></i> Categories</a></li>
+            <li>{% url 'admin_tags' as tags_url %}<a href="{{ tags_url }}" class="sidebar-link {% if request.path == tags_url %}active{% endif %}"><i class="fa-solid fa-tag"></i> Tags</a></li>
         </ul>
     </nav>
 

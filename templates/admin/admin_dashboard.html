@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% load static %}
 
 {% block title %}Admin Dashboard - ThoughtNest{% endblock %}
@@ -12,44 +12,275 @@
 <div class="dashboard-wrapper">
     {% include 'admin/sidebar.html' %}
     <div class="admin-content">
+
         {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
         {% endif %}
 
-        <div class="admin-stats">
-            <div class="stat-card">
-                <span class="stat-icon"><i class="fa-solid fa-pen-nib"></i></span>
-                <div class="stat-info">
-                    <h3>Total Posts</h3>
-                    <p class="stat-value">{{ total_posts }}</p>
+        <!-- Page Header -->
+        <div class="admin-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p style="color:var(--text-muted);margin:0;font-size:0.9rem;">Welcome back, <strong>{{
+                        user.get_full_name|default:user.username }}</strong> 👋</p>
+            </div>
+            <a href="{% url 'post_create' %}" class="btn-primary">
+                <i class="fa-solid fa-pen-nib"></i> New Post
+            </a>
+        </div>
+
+        <!-- Stat Cards Row -->
+        <div class="admin-stats-grid">
+            <div class="stat-card stat-card--posts">
+                <div class="stat-card__icon"><i class="fa-solid fa-pen-nib"></i></div>
+                <div class="stat-card__body">
+                    <span class="stat-card__label">Total Posts</span>
+                    <span class="stat-card__value">{{ total_posts }}</span>
+                    <span class="stat-card__sub">
+                        <i class="fa-solid fa-clock" style="color:#4e9b6f"></i> {{ posts_last_24h }} in last 24h
+                    </span>
                 </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-icon"><i class="fa-solid fa-heart"></i></span>
-                <div class="stat-info">
-                    <h3>Total Likes</h3>
-                    <p class="stat-value">{{ total_likes }}</p>
+            <div class="stat-card stat-card--users">
+                <div class="stat-card__icon"><i class="fa-solid fa-users"></i></div>
+                <div class="stat-card__body">
+                    <span class="stat-card__label">Total Users</span>
+                    <span class="stat-card__value">{{ total_users }}</span>
+                    <span class="stat-card__sub">
+                        <i class="fa-solid fa-user-plus" style="color:#4e9b6f"></i> +{{ new_users_week }} this week
+                    </span>
                 </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-icon"><i class="fa-solid fa-comment"></i></span>
-                <div class="stat-info">
-                    <h3>Total Comments</h3>
-                    <p class="stat-value">{{ total_comments }}</p>
+            <div class="stat-card stat-card--comments">
+                <div class="stat-card__icon"><i class="fa-solid fa-comments"></i></div>
+                <div class="stat-card__body">
+                    <span class="stat-card__label">Total Comments</span>
+                    <span class="stat-card__value">{{ total_comments }}</span>
+                    <span class="stat-card__sub">
+                        <i class="fa-solid fa-clock" style="color:#4e9b6f"></i> {{ comments_last_24h }} in last 24h
+                    </span>
+                </div>
+            </div>
+            <div class="stat-card stat-card--likes">
+                <div class="stat-card__icon"><i class="fa-solid fa-folder-tree"></i></div>
+                <div class="stat-card__body">
+                    <span class="stat-card__label">Categories & Tags</span>
+                    <span class="stat-card__value">{{ total_categories }} / {{ total_tags }}</span>
+                    <span class="stat-card__sub">
+                        <i class="fa-solid fa-tags" style="color:var(--accent-color)"></i> Structure metrics
+                    </span>
                 </div>
             </div>
         </div>
 
-        <div class="admin-welcome">
-            <h2>Welcome back, {{ user.get_full_name|default:user.username }}! 👋</h2>
-            <p>Use the sidebar menu on the left to navigate to different sections of your admin panel.</p>
+        <!-- Two-column layout -->
+        <div class="admin-two-col">
+
+            <!-- Recent Posts -->
+            <div class="admin-panel">
+                <div class="admin-panel__header">
+                    <h2><i class="fa-solid fa-clock-rotate-left"></i> Recent Posts</h2>
+                    <a href="{% url 'admin_posts' %}" class="admin-panel__link">View all →</a>
+                </div>
+                <div class="admin-panel__body">
+                    {% for post in recent_posts %}
+                    <div class="activity-item">
+                        <div class="activity-item__icon activity-icon--post">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </div>
+                        <div class="activity-item__body">
+                            <a href="{% url 'post_detail' post.pk %}" class="activity-item__title">{{
+                                post.title|truncatechars:50 }}</a>
+                            <span class="activity-item__meta">by {{
+                                post.author.get_full_name|default:post.author.username }} · {{ post.created_at|date:"M
+                                d" }}</span>
+                        </div>
+                        <span
+                            class="activity-item__badge {% if post.status == 'published' %}badge--green{% else %}badge--amber{% endif %}">
+                            {{ post.get_status_display }}
+                        </span>
+                    </div>
+                    {% empty %}
+                    <p class="admin-panel__empty">No posts yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recent Comments -->
+            <div class="admin-panel">
+                <div class="admin-panel__header">
+                    <h2><i class="fa-solid fa-comment-dots"></i> Recent Comments</h2>
+                    <a href="{% url 'admin_comments' %}" class="admin-panel__link">View all →</a>
+                </div>
+                <div class="admin-panel__body">
+                    {% for comment in recent_comments %}
+                    <div class="activity-item">
+                        <div class="activity-item__icon activity-icon--comment">
+                            <i class="fa-solid fa-comment"></i>
+                        </div>
+                        <div class="activity-item__body">
+                            <span class="activity-item__title">{{ comment.content|truncatechars:60 }}</span>
+                            <span class="activity-item__meta">
+                                by {{ comment.author.get_full_name|default:comment.author.username }} on
+                                <a href="{% url 'post_detail' comment.post.pk %}">{{ comment.post.title|truncatechars:30
+                                    }}</a>
+                            </span>
+                        </div>
+                        <span class="activity-item__time">{{ comment.created_at|timesince }} ago</span>
+                    </div>
+                    {% empty %}
+                    <p class="admin-panel__empty">No comments yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
         </div>
+
+        <!-- Two more panels -->
+        <div class="admin-two-col">
+
+            <!-- Top Posts -->
+            <div class="admin-panel">
+                <div class="admin-panel__header">
+                    <h2><i class="fa-solid fa-fire"></i> Top Posts by Likes</h2>
+                </div>
+                <div class="admin-panel__body">
+                    {% for post in top_posts %}
+                    <div class="top-item">
+                        <span class="top-item__rank">{{ forloop.counter }}</span>
+                        <div class="top-item__body">
+                            <a href="{% url 'post_detail' post.pk %}" class="top-item__title">{{
+                                post.title|truncatechars:45 }}</a>
+                            <span class="top-item__meta">{{ post.author.get_full_name|default:post.author.username
+                                }}</span>
+                        </div>
+                        <div class="top-item__stats">
+                            <span><i class="fa-solid fa-heart" style="color:#c25a4a"></i> {{ post.like_count }}</span>
+                            <span><i class="fa-solid fa-comment" style="color:#7aaa8e"></i> {{ post.comment_count
+                                }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="admin-panel__empty">No posts yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Top Authors -->
+            <div class="admin-panel">
+                <div class="admin-panel__header">
+                    <h2><i class="fa-solid fa-trophy"></i> Most Active Authors</h2>
+                </div>
+                <div class="admin-panel__body">
+                    {% for author in top_authors %}
+                    <div class="top-item">
+                        <span class="top-item__rank top-item__rank--author">{{ forloop.counter }}</span>
+                        <div class="top-item__body">
+                            <span class="top-item__title">{{ author.get_full_name|default:author.username }}</span>
+                            <span class="top-item__meta">@{{ author.username }}</span>
+                        </div>
+                        <div class="top-item__stats">
+                            <span><i class="fa-solid fa-pen-nib" style="color:#6b4b3e"></i> {{ author.post_count }}
+                                post{{ author.post_count|pluralize }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="admin-panel__empty">No authors yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Quick Actions & System Info -->
+        <div class="admin-two-col">
+            <div class="admin-panel">
+                <div class="admin-panel__header">
+                    <h2><i class="fa-solid fa-bolt"></i> Quick Actions</h2>
+                </div>
+                <div class="admin-quick-actions">
+                    <a href="{% url 'admin_posts' %}" class="quick-action">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        <span>Manage Posts</span>
+                    </a>
+                    <a href="{% url 'admin_comments' %}" class="quick-action">
+                        <i class="fa-solid fa-comments"></i>
+                        <span>Moderate Comments</span>
+                    </a>
+                    <a href="{% url 'admin_categories' %}" class="quick-action">
+                        <i class="fa-solid fa-folder"></i>
+                        <span>Categories</span>
+                    </a>
+                    <a href="{% url 'admin_settings' %}" class="quick-action">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Site Settings</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="admin-panel">
+                <div class="admin-panel__header">
+                    <h2><i class="fa-solid fa-database"></i> System Overview</h2>
+                </div>
+                <div class="admin-panel__body">
+                    <div class="activity-item">
+                        <div class="activity-item__body">
+                            <span class="activity-item__title">Total Categories</span>
+                            <span class="activity-item__meta">Organize your content into topics</span>
+                        </div>
+                        <span class="activity-item__badge badge--green">{{ total_categories }}</span>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-item__body">
+                            <span class="activity-item__title">Total Tags</span>
+                            <span class="activity-item__meta">Fine-grained keywords for posts</span>
+                        </div>
+                        <span class="activity-item__badge badge--amber">{{ total_tags }}</span>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-item__body">
+                            <span class="activity-item__title">Interaction Rate</span>
+                            <span class="activity-item__meta">Comments + Likes per Post</span>
+                        </div>
+                        <span class="activity-item__badge badge--blue">
+                            {{ interaction_rate|floatformat:1 }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row: Newest Users -->
+        <div class="admin-panel" style="margin-top: 2rem;">
+            <div class="admin-panel__header">
+                <h2><i class="fa-solid fa-user-plus"></i> Newly Registered Users</h2>
+            </div>
+            <div class="admin-panel__body">
+                <div class="admin-users-list">
+                    {% for user_obj in newest_users %}
+                    <div class="activity-item">
+                        <div class="activity-item__icon activity-icon--user">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="activity-item__body">
+                            <span class="activity-item__title">{{ user_obj.get_full_name|default:user_obj.username
+                                }}</span>
+                            <span class="activity-item__meta">@{{ user_obj.username }} · Joined {{
+                                user_obj.date_joined|date:"M d, Y" }}</span>
+                        </div>
+                        <span class="activity-item__time">{{ user_obj.date_joined|timesince }} ago</span>
+                    </div>
+                    {% empty %}
+                    <p class="admin-panel__empty">No users registered yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

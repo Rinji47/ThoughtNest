@@ -11,4 +11,6 @@ urlpatterns = [
 	path('admin-page/', views.admin_page, name='admin_page'),
 	path('profile/', views.profile, name='profile'),
 	path('profile-settings/', views.profile_settings, name='profile_settings'),
+    path('admin/users-manage/', views.user_management, name='admin_users_manage'),
+    path('admin/users/<int:pk>/delete/', views.admin_delete_user, name='admin_delete_user'),
 ]

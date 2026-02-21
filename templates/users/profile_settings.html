@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+﻿{% extends "base_dashboard.html" %}
 {% load static %}
 
 {% block title %}Account Settings - ThoughtNest{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/profile_settings.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -12,50 +13,169 @@
     {% include 'users/profile_sidebar.html' %}
 
     <main class="profile-content">
-        
+
         {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
         {% endif %}
 
-        <section class="section-container">
-            <div class="settings-box">
-                <h3 class="settings-box-title"><i class="fa-solid fa-user-circle"></i> Profile Information</h3>
-                <dl class="settings-dl">
-                    <dt>Full Name</dt>
-                    <dd>{{ user.get_full_name|default:"Not set" }}</dd>
-                    
-                    <dt>Email</dt>
-                    <dd>{{ user.email }}</dd>
-                    
-                    <dt>Username</dt>
-                    <dd class="last">{{ user.username }}</dd>
-                </dl>
-                <a href="#" class="settings-link">Edit Profile →</a>
-            </div>
+        <h1 class="section-title"><i class="fa-solid fa-gear" style="color:var(--accent-color);font-size:0.85em;"></i>
+            Account Settings</h1>
 
-            <div class="settings-box settings-box-spacing">
-                <h3 class="settings-box-title"><i class="fa-solid fa-lock"></i> Security</h3>
-                <p class="settings-description">Manage your password and security settings.</p>
-                <a href="#" class="settings-link">Change Password →</a>
+        <!-- Profile Information -->
+        <div class="settings-panel">
+            <div class="settings-panel__header">
+                <i class="fa-solid fa-user-circle"></i>
+                <div>
+                    <h2>Profile Information</h2>
+                    <p>Update your personal details and public profile</p>
+                </div>
             </div>
+            <form method="post" action="{% url 'profile_settings' %}" enctype="multipart/form-data"
+                class="settings-panel__body">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
 
-            <div class="settings-box settings-box-spacing settings-box-warning">
-                <h3 class="settings-box-title-warning"><i class="fa-solid fa-gear"></i> Preferences</h3>
-                <p class="settings-description-warning">Additional customization options coming soon.</p>
-            </div>
+                <!-- avatar image and upload removed -->
 
-            <div class="settings-box settings-box-spacing settings-box-danger">
-                <h3 class="settings-box-title-warning"><i class="fa-solid fa-sign-out-alt"></i> Sign Out</h3>
-                <p class="settings-description-warning">End your current session.</p>
-                <a href="{% url 'logout' %}" class="settings-link settings-link-danger">Logout →</a>
+                <div class="settings-form-grid">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}"
+                            class="form-input" placeholder="First name">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}"
+                            class="form-input" placeholder="Last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" class="form-input"
+                            placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" value="{{ profile.location|default:'' }}"
+                            class="form-input" placeholder="City, Country">
+                    </div>
+                    <div class="form-group">
+                        <label for="website">Website</label>
+                        <input type="url" id="website" name="website" value="{{ profile.website|default:'' }}"
+                            class="form-input" placeholder="https://yoursite.com">
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" name="bio" rows="3" class="form-input"
+                            placeholder="A short bio about yourself…"
+                            maxlength="500">{{ profile.bio|default:'' }}</textarea>
+                        <p class="input-hint">Max 500 characters.</p>
+                    </div>
+                </div>
+
+                <h3 class="settings-sub-heading"><i class="fa-brands fa-connectdevelop"></i> Social Links</h3>
+                <div class="settings-form-grid">
+                    <div class="form-group">
+                        <label for="twitter"><i class="fa-brands fa-x-twitter"></i> Twitter / X</label>
+                        <input type="text" id="twitter" name="twitter" value="{{ profile.twitter|default:'' }}"
+                            class="form-input" placeholder="@handle">
+                    </div>
+                    <div class="form-group">
+                        <label for="github"><i class="fa-brands fa-github"></i> GitHub</label>
+                        <input type="text" id="github" name="github" value="{{ profile.github|default:'' }}"
+                            class="form-input" placeholder="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="linkedin"><i class="fa-brands fa-linkedin"></i> LinkedIn</label>
+                        <input type="text" id="linkedin" name="linkedin" value="{{ profile.linkedin|default:'' }}"
+                            class="form-input" placeholder="profile URL or username">
+                    </div>
+                </div>
+
+                <h3 class="settings-sub-heading"><i class="fa-solid fa-bell"></i> Notifications</h3>
+                <div class="profile-toggles">
+                    <label class="toggle-row-sm">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Email Notifications</span>
+                            <span class="toggle-desc">Get notified when someone comments on your post</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="email_notifications" {% if profile and profile.email_notifications %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                    <label class="toggle-row-sm">
+                        <div class="toggle-info">
+                            <span class="toggle-label">Newsletter</span>
+                            <span class="toggle-desc">Receive our weekly digest of top posts</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <!-- newsletter_subscription checkbox removed -->
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary" style="margin-top:1.25rem;">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                </button>
+            </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="settings-panel">
+            <div class="settings-panel__header">
+                <i class="fa-solid fa-lock"></i>
+                <div>
+                    <h2>Change Password</h2>
+                    <p>Update your account password</p>
+                </div>
             </div>
-        </section>
+            <form method="post" action="{% url 'profile_settings' %}" class="settings-panel__body">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+                <div class="settings-form-grid" style="max-width:500px;">
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label for="old_password">Current Password</label>
+                        <input type="password" id="old_password" name="old_password" class="form-input"
+                            placeholder="Enter current password" autocomplete="current-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password1">New Password</label>
+                        <input type="password" id="new_password1" name="new_password1" class="form-input"
+                            placeholder="New password" autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password2">Confirm New Password</label>
+                        <input type="password" id="new_password2" name="new_password2" class="form-input"
+                            placeholder="Confirm new password" autocomplete="new-password">
+                    </div>
+                </div>
+                <button type="submit" class="btn-secondary" style="margin-top:0.5rem;">
+                    <i class="fa-solid fa-key"></i> Change Password
+                </button>
+            </form>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-panel settings-panel--danger">
+            <div class="settings-panel__header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <h2>Sign Out</h2>
+                    <p>End your current session</p>
+                </div>
+            </div>
+            <div class="settings-panel__body">
+                <a href="{% url 'logout' %}" class="btn-outline-danger">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </a>
+            </div>
+        </div>
+
     </main>
 </div>
 {% endblock %}

@@ -5,23 +5,13 @@ from django.utils.text import slugify
 
 class Category(models.Model):
 	name = models.CharField(max_length=120, unique=True)
-	slug = models.SlugField(max_length=140, unique=True, blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		ordering = ['name']
 		verbose_name_plural = 'categories'
 
-	def save(self, *args, **kwargs):
-		if not self.slug:
-			base_slug = slugify(self.name)[:130] or 'category'
-			slug = base_slug
-			counter = 1
-			while Category.objects.filter(slug=slug).exclude(pk=self.pk).exists():
-				slug = f"{base_slug}-{counter}"
-				counter += 1
-			self.slug = slug
-		super().save(*args, **kwargs)
+	# Removed slug logic
 
 	def __str__(self):
 		return self.name
@@ -29,22 +19,12 @@ class Category(models.Model):
 
 class Tag(models.Model):
 	name = models.CharField(max_length=80, unique=True)
-	slug = models.SlugField(max_length=100, unique=True, blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		ordering = ['name']
 
-	def save(self, *args, **kwargs):
-		if not self.slug:
-			base_slug = slugify(self.name)[:90] or 'tag'
-			slug = base_slug
-			counter = 1
-			while Tag.objects.filter(slug=slug).exclude(pk=self.pk).exists():
-				slug = f"{base_slug}-{counter}"
-				counter += 1
-			self.slug = slug
-		super().save(*args, **kwargs)
+	# Removed slug logic
 
 	def __str__(self):
 		return self.name
@@ -72,8 +52,6 @@ class Post(models.Model):
 	)
 	tags = models.ManyToManyField(Tag, blank=True, related_name='posts')
 	title = models.CharField(max_length=200)
-	slug = models.SlugField(max_length=220, unique=True, blank=True)
-	featured_image = models.ImageField(upload_to='posts/', blank=True, null=True, help_text="Featured image for the post")
 	content = models.TextField()
 	status = models.CharField(
 		max_length=20,
@@ -86,16 +64,7 @@ class Post(models.Model):
 	class Meta:
 		ordering = ['-created_at']
 
-	def save(self, *args, **kwargs):
-		if not self.slug:
-			base_slug = slugify(self.title)[:200] or 'post'
-			slug = base_slug
-			counter = 1
-			while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists():
-				slug = f"{base_slug}-{counter}"
-				counter += 1
-			self.slug = slug
-		super().save(*args, **kwargs)
+	# Removed slug logic
 
 	def __str__(self):
 		return self.title
@@ -134,3 +103,27 @@ class Like(models.Model):
 
 	def __str__(self):
 		return f"Like {self.post_id} by {self.user_id}"
+
+class SiteSettings(models.Model):
+	site_name = models.CharField(max_length=100, default='ThoughtNest')
+	site_tagline = models.CharField(max_length=200, default='Gather ideas. Grow perspectives.')
+	site_description = models.TextField(blank=True)
+	contact_email = models.EmailField(blank=True)
+	posts_per_page = models.PositiveIntegerField(default=12)
+	excerpt_length = models.PositiveIntegerField(default=25)
+	allow_comments = models.BooleanField(default=True)
+	moderate_comments = models.BooleanField(default=False)
+	allow_registration = models.BooleanField(default=True)
+	show_author = models.BooleanField(default=True)
+
+	def __str__(self):
+		return "Site Settings"
+
+	class Meta:
+		verbose_name = "Site Settings"
+		verbose_name_plural = "Site Settings"
+
+	@classmethod
+	def load(cls):
+		obj, created = cls.objects.get_or_create(pk=1)
+		return obj

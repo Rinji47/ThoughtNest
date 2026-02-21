@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% load static %}
 
 {% block title %}My Comments - ThoughtNest{% endblock %}
@@ -15,24 +15,26 @@
             <!-- Filters -->
             <form method="get" class="posts-filter-form">
                 <div class="filter-row filter-row-horizontal">
-                    <input type="text" name="search" placeholder="Search comments..." value="{{ request.GET.search }}" class="filter-input">
+                    <input type="text" name="q" placeholder="Search comments..." value="{{ search_query }}" class="filter-input">
                     <select name="post" class="filter-select">
                         <option value="">All Posts</option>
-                        {% for post in user_posts %}
-                            <option value="{{ post.id }}" {% if request.GET.post == post.id|stringformat:'s' %}selected{% endif %}>{{ post.title|truncatechars:30 }}</option>
+                        {% for post in posts %}
+                            <option value="{{ post.id }}" {% if selected_post == post.id|stringformat:'s' %}selected{% endif %}>{{ post.title|truncatechars:30 }}</option>
                         {% endfor %}
                     </select>
-                    <select name="time" class="filter-select">
+                    <select name="date_range" class="filter-select">
                         <option value="">All Time</option>
-                        <option value="today" {% if request.GET.time == 'today' %}selected{% endif %}>Today</option>
-                        <option value="week" {% if request.GET.time == 'week' %}selected{% endif %}>This Week</option>
-                        <option value="month" {% if request.GET.time == 'month' %}selected{% endif %}>This Month</option>
+                        <option value="today" {% if selected_date_range == 'today' %}selected{% endif %}>Today</option>
+                        <option value="week" {% if selected_date_range == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if selected_date_range == 'month' %}selected{% endif %}>This Month</option>
+                        <option value="year" {% if selected_date_range == 'year' %}selected{% endif %}>This Year</option>
                     </select>
                     <button type="submit" class="btn-filter"><i class="fa-solid fa-magnifying-glass"></i> Apply</button>
                 </div>
             </form>
+
             {% if comments %}
-                <p class="posts-found-count">Found <strong>{{ comments.count }}</strong> comment{% if comments.count != 1 %}s{% endif %}</p>
+                <p class="posts-found-count">Found <strong>{{ page_obj.paginator.count }}</strong> comment{% if page_obj.paginator.count != 1 %}s{% endif %}</p>
                 <div class="user-comments-list">
                     {% for comment in comments %}
                     <div class="user-comment-card" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; background: #fffaf5; border-radius: 16px; box-shadow: 0 2px 8px rgba(107,75,62,0.06); padding: 1.2rem 1.5rem; margin-bottom: 1.2rem;">
@@ -52,6 +54,28 @@
                     </div>
                     {% endfor %}
                 </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="pagination-wrapper" style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.5rem;">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_post %}&post={{ selected_post }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}" class="btn-pagination">&laquo; Previous</a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="btn-pagination active">{{ num }}</span>
+                        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                            <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_post %}&post={{ selected_post }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}" class="btn-pagination">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_post %}&post={{ selected_post }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}" class="btn-pagination">Next &raquo;</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
             {% else %}
                 <div class="posts-empty-state">
                     <i class="fa-solid fa-comments no-comments-icon"></i>

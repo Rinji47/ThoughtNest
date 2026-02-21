@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Posts tagged {{ tag.name }} {% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Posts tagged {{ tag.name }}</h1>
+
+    {% if posts %}
+    <div class="posts-grid">
+        {% for post in posts %}
+        <article class="post-card">
+
+            <div class="post-content">
+                <span class="post-category">
+                    {{ post.category.name }}
+                </span>
+
+                <h3 class="post-title">{{ post.title }}</h3>
+
+                <p class="post-excerpt">
+                    {{ post.content|truncatewords:20 }}
+                </p>
+
+                <div class="post-meta">
+                    <span>
+                        <i class="fa-regular fa-user"></i>
+                        {{ post.author.get_full_name|default:post.author.username }}
+                    </span>
+                    <span>
+                        <i class="fa-regular fa-calendar"></i>
+                        {{ post.created_at|date:"M d, Y" }}
+                    </span>
+                </div>
+
+                <div class="post-footer">
+                    <a href="{% url 'post_detail' post.pk %}" class="read-more">
+                        Read More <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fa-regular fa-folder-open empty-state-icon"></i>
+        <p class="empty-state-text">
+            No posts found with this tag.
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

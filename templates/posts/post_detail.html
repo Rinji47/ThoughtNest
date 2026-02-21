@@ -9,50 +9,60 @@
 
 {% block content %}
 {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
+<div class="messages-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
     </div>
+    {% endfor %}
+</div>
 {% endif %}
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    <i class="fa-solid fa-chevron-right"></i>
+    {% if post.category %}
+    <a href="/categories">{{ post.category.name }}</a>
+    <i class="fa-solid fa-chevron-right"></i>
+    {% endif %}
+    <span>{{ post.title|truncatechars:50 }}</span>
+</nav>
 
 <div class="post-detail-container">
     <!-- Post Header -->
     <div class="post-header">
         {% if post.category %}
-        <span class="post-category">{{ post.category.name }}</span>
+        <span class="post-category">
+            <i class="fa-solid fa-folder"></i> {{ post.category.name }}
+        </span>
         {% endif %}
-        
+
         <h1 class="post-title">{{ post.title }}</h1>
 
         <div class="post-meta-info">
+            {% if site_settings.show_author %}
             <div class="post-meta-item">
                 <i class="fa-solid fa-user"></i>
                 <span>{{ post.author.get_full_name|default:post.author.username }}</span>
             </div>
+            {% endif %}
             <div class="post-meta-item">
-                <i class="fa-solid fa-calendar"></i>
-                <span>{{ post.created_at|date:"M d, Y" }}</span>
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>{{ post.created_at|date:"F j, Y" }}</span>
             </div>
             <div class="post-meta-item">
                 <i class="fa-solid fa-heart"></i>
-                <span>{{ post.likes.count }} likes</span>
+                <span>{{ post.likes.count }} like{{ post.likes.count|pluralize }}</span>
             </div>
             <div class="post-meta-item">
                 <i class="fa-solid fa-comment"></i>
-                <span>{{ comments.count }} comments</span>
-            </div>
-        </div>
-    </div>
+				<span>{{ comments.count }} comment{{ comments.count|pluralize }}</span>
+			</div>
+		</div>
+	</div>
 
-    <!-- Featured Image -->
-    {% if post.featured_image %}
-    <div class="post-featured-image">
-        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
-    </div>
-    {% endif %}
+	<!-- featured_image removed -->
 
     <!-- Post Body -->
     <div class="post-body">
@@ -74,27 +84,39 @@
             {% if user.is_authenticated %}
             <form method="post" action="{% url 'post_toggle_like' post.pk %}" class="like-form">
                 {% csrf_token %}
-                <button type="submit" class="like-btn {% if user_has_liked %}liked{% endif %}" id="likeBtn" data-post-id="{{ post.pk }}" title="Like this post">
-                    <i class="fa-solid fa-heart"></i>
+                <button type="submit" class="like-btn {% if user_has_liked %}liked{% endif %}" id="likeBtn"
+                    title="Like this post">
+                    <i class="fa-{% if user_has_liked %}solid{% else %}regular{% endif %} fa-heart"></i>
                 </button>
-                <span class="like-count">{{ post.likes.count }} likes</span>
+                <span class="like-count">{{ post.likes.count }} like{{ post.likes.count|pluralize }}</span>
             </form>
             {% else %}
             <p class="not-logged-in-text">
-                <a href="{% url 'login' %}" class="login-link">Log in</a> to like
+                <a href="{% url 'login' %}" class="login-link">Log in</a> to like this post
             </p>
+            {% endif %}
+
+            {% if user == post.author %}
+            <a href="{% url 'edit_post' post.pk %}" class="btn-secondary btn-sm" style="margin-left:auto;">
+                <i class="fa-solid fa-pen"></i> Edit
+            </a>
             {% endif %}
         </div>
     </div>
 
     <!-- Comments Section -->
     <section class="comments-section">
-        <h2 class="comments-title">Comments</h2>
+        <h2 class="comments-title">
+            <i class="fa-solid fa-comments"></i> Comments
+            {% if comments.count %}<span style="font-size:0.85rem;font-weight:400;color:var(--text-faint);">({{ comments.count }})</span>{% endif %}
+        </h2>
 
+        {% if site_settings.allow_comments %}
         {% if user.is_authenticated %}
         <form method="post" action="{% url 'post_add_comment' post.pk %}" class="comment-form">
             {% csrf_token %}
-            <textarea name="content" placeholder="Share your thoughts..." class="comment-textarea" required></textarea>
+            <textarea name="content" placeholder="Share your thoughts on this post…" class="comment-textarea"
+                required></textarea>
             <button type="submit" class="submit-comment-btn">
                 <i class="fa-solid fa-paper-plane"></i> Post Comment
             </button>
@@ -102,8 +124,17 @@
         {% else %}
         <div class="comment-login-prompt">
             <p class="comment-login-text">
-                <a href="{% url 'login' %}" class="login-link">Log in</a> to comment on this post.
+                <a href="{% url 'login' %}" class="login-link">Log in</a> to join the conversation.
             </p>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="no-comments"
+            style="padding: 1.5rem; text-align: center; border-radius: 12px; border: 1px dashed var(--border-color);">
+            <i class="fa-solid fa-comment-slash"
+                style="font-size: 1.5rem; color: var(--text-faint); margin-bottom: 0.5rem;"></i>
+            <p style="margin:0;color:var(--text-muted); font-size: 0.9rem;">Commenting is currently disabled for this
+                site.</p>
         </div>
         {% endif %}
 
@@ -113,6 +144,9 @@
             {% for comment in comments %}
             <div class="comment-item">
                 <div class="comment-author">
+                    <div class="comment-avatar">
+                        {{ comment.author.get_full_name|default:comment.author.username|first|upper }}
+                    </div>
                     <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
                     <span class="comment-date">{{ comment.created_at|timesince }} ago</span>
                 </div>
@@ -122,7 +156,8 @@
         </div>
         {% else %}
         <div class="no-comments">
-            <p><i class="fa-solid fa-comments no-comments-icon"></i>No comments yet. Be the first to share your thoughts!</p>
+            <i class="fa-regular fa-comments no-comments-icon"></i>
+            <p style="margin:0;color:var(--text-muted);">No comments yet. Be the first to share your thoughts!</p>
         </div>
         {% endif %}
     </section>

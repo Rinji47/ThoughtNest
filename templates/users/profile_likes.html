@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% load static %}
 
 {% block title %}Liked Posts - ThoughtNest{% endblock %}
@@ -33,19 +33,13 @@
                     </div>
                 </div>
             </form>
+
             {% if likes %}
                 <p class="posts-found-count">Found <strong>{{ likes.count }}</strong> liked post{% if likes.count != 1 %}s{% endif %}</p>
                 <div class="user-posts-grid">
                     {% for like in likes %}
                     {% with post=like.post %}
                     <div class="user-post-card">
-                        <div class="user-post-card-image">
-                            {% if post.featured_image %}
-                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
-                            {% else %}
-                                <i class="fa-solid fa-image"></i>
-                            {% endif %}
-                        </div>
                         <div class="user-post-card-body">
                             <div class="user-post-card-badges">
                                 {% if post.category %}

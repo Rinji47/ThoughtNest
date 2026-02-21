@@ -9,41 +9,43 @@
 
 {% block content %}
 {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
+<div class="messages-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
     </div>
+    {% endfor %}
+</div>
 {% endif %}
 
 <div class="container">
-    <h1 class="page-title">Browse by Category</h1>
-    <p class="page-subtitle">Explore posts organized by topics</p>
+    <div class="categories-page-header">
+        <h1 class="page-title">Browse by Category</h1>
+        <p class="page-subtitle">Explore posts organized by topics that interest you</p>
+    </div>
 
     <!-- Categories Grid -->
     <div class="categories-grid">
         {% for category in categories %}
-        <div class="category-card" data-category="{{ category.slug }}">
-            <div class="category-icon"><i class="fa-solid fa-folder"></i></div>
+        <a href="{% url 'category_posts' category.id %}" class="category-card" data-category="{{ category.id }}">
+            <div class="category-icon"><i class="fa-solid fa-folder-open"></i></div>
             <h2>{{ category.name }}</h2>
-            <p class="category-count">{{ category.post_count }} posts</p>
-            <a href="/?category={{ category.slug }}" class="category-link">Explore →</a>
-        </div>
+            <p class="category-count">{{ category.post_count }} post{{ category.post_count|pluralize }}</p>
+            <span class="category-link">Explore <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
         {% empty %}
-        <p>No categories yet.</p>
+        <p style="grid-column:1/-1;text-align:center;color:var(--text-muted);">No categories yet.</p>
         {% endfor %}
     </div>
 
     <!-- Popular Tags -->
     <section class="tags-section">
-        <h2 class="section-title">Popular Tags</h2>
+    <h2 class="section-title">Popular Tags</h2>
         <div class="tags-container">
             {% for tag in tags %}
-            <a href="/?tag={{ tag.slug }}" class="tag">#{{ tag.name }}</a>
+                <a href="{% url 'tag_posts' pk=tag.id %}" class="tag" data-category="{{ tag.id }}">#{{ tag.name }}</a>
             {% empty %}
-            <p>No tags yet.</p>
+                <p style="color:var(--text-muted);font-size:0.9rem;">No tags yet.</p>
             {% endfor %}
         </div>
     </section>
@@ -53,18 +55,21 @@
         <h2 class="section-title">Latest from Each Category</h2>
         {% for category in categories %}
         <div class="category-section">
-            <h3 class="category-heading">{{ category.name }}</h3>
+            <div class="category-section-header">
+                <h3 class="category-heading">{{ category.name }}</h3>
+                <a href="{% url 'category_posts' category.id %}" class="category-see-all">See all →</a>
+            </div>
             <div class="small-posts-grid">
                 {% for post in category.recent_posts %}
                 <article class="small-post">
                     <h4><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h4>
                     <div class="small-post-meta">
-                        <span>By {{ post.author.get_full_name|default:post.author.username }}</span>
-                        <span>{{ post.created_at|date:"M d, Y" }}</span>
+                        <span><i class="fa-regular fa-user"></i> {{ post.author.get_full_name|default:post.author.username }}</span>
+                        <span><i class="fa-regular fa-calendar"></i> {{ post.created_at|date:"M d, Y" }}</span>
                     </div>
                 </article>
                 {% empty %}
-                <p>No posts in this category yet.</p>
+                <p style="color:var(--text-muted);font-size:0.9rem;">No posts in this category yet.</p>
                 {% endfor %}
             </div>
         </div>

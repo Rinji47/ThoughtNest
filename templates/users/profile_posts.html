@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% load static %}
 
 {% block title %}My Posts - ThoughtNest{% endblock %}
@@ -23,6 +23,7 @@
                 {% endfor %}
             </div>
         {% endif %}
+
         <section class="section-container">
             <div class="posts-section-header">
                 <a href="{% url 'post_create' %}" class="btn-new-post">
@@ -137,4 +138,5 @@
         </section>
     </main>
 </div>
+
 {% endblock %}

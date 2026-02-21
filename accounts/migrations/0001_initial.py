@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('github', models.CharField(blank=True, max_length=100)),
                 ('linkedin', models.CharField(blank=True, max_length=100)),
                 ('email_notifications', models.BooleanField(default=True, help_text='Receive email notifications')),
-                ('newsletter_subscription', models.BooleanField(default=False, help_text='Subscribe to newsletter')),
+                # newsletter_subscription field removed
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),

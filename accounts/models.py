@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(max_length=500, blank=True, help_text="A short bio about yourself")
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, help_text="Profile picture")
+    # avatar field removed
     location = models.CharField(max_length=100, blank=True)
     website = models.URLField(max_length=200, blank=True)
     
@@ -23,7 +23,7 @@ class UserProfile(models.Model):
     
     # Preferences
     email_notifications = models.BooleanField(default=True, help_text="Receive email notifications")
-    newsletter_subscription = models.BooleanField(default=False, help_text="Subscribe to newsletter")
+    # newsletter_subscription field removed
     
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)

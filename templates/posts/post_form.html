@@ -1,99 +1,231 @@
 {% extends "base.html" %}
+
 {% load static %}
 
+
+
 {% block title %}
+
 {% if mode == 'edit' %}Edit Post - ThoughtNest{% else %}New Post - ThoughtNest{% endif %}
+
 {% endblock %}
+
+
 
 {% block extra_css %}
+
 <link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+
 {% endblock %}
+
+
 
 {% block content %}
+
 {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
+
+<div class="messages-container">
+
+	{% for message in messages %}
+
+	<div class="alert alert-{{ message.tags }}">
+
+		{{ message }}
+
+	</div>
+
+	{% endfor %}
+
+</div>
+
 {% endif %}
 
+
+
 <div class="container">
-	<h1 class="page-title">
-		{% if mode == 'edit' %}Edit Post{% else %}Create New Post{% endif %}
-	</h1>
 
-	<form method="post" class="post-form" enctype="multipart/form-data">
-		{% csrf_token %}
-		<div class="form-group">
-			<label for="postTitle">Title</label>
-			<input type="text" id="postTitle" name="title" value="{% if post %}{{ post.title }}{% endif %}" required>
-		</div>
+	<div class="post-form-wrapper">
 
-		<div class="form-group">
-			<label for="postCategory">Category</label>
-			<select id="postCategory" name="category">
-				<option value="">Select category</option>
-				{% for category in categories %}
-				<option value="{{ category.id }}" {% if post and post.category_id == category.id %}selected{% endif %}>
-					{{ category.name }}
-				</option>
-				{% endfor %}
-			</select>
-		</div>
+		<a href="javascript:history.back()" class="back-link">
 
-		<div class="form-group">
-			<label for="postTags">Tags (comma-separated)</label>
-			<input type="text" id="postTags" name="tags" value="{% if post %}{% for tag in post.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}">
-			<div class="tag-suggestions" id="tagSuggestions" aria-live="polite"></div>
-			{% if popular_tags %}
-			<div class="popular-tags">
-				<span class="popular-tags-label">Popular tags</span>
-				<div class="popular-tags-list">
-					{% for tag in popular_tags %}
-					<button type="button" class="tag-chip" data-tag="{{ tag.name }}">{{ tag.name }}</button>
+			<i class="fa-solid fa-arrow-left"></i> Go Back
+
+		</a>
+
+
+
+		<h1 class="page-title">
+
+			{% if mode == 'edit' %}
+
+			<i class="fa-solid fa-pen-to-square" style="color:var(--accent-color);font-size:0.85em;"></i> Edit Post
+
+			{% else %}
+
+			<i class="fa-solid fa-pen-nib" style="color:var(--accent-color);font-size:0.85em;"></i> Create New Post
+
+			{% endif %}
+
+		</h1>
+
+
+
+		<form method="post" class="post-form" enctype="multipart/form-data">
+
+			{% csrf_token %}
+
+
+
+			<div class="form-group">
+
+				<label for="postTitle">Post Title</label>
+
+				<input type="text" id="postTitle" name="title" value="{% if post %}{{ post.title }}{% endif %}" required
+
+					placeholder="Give your post a compelling title">
+
+			</div>
+
+
+
+			<div class="form-group">
+
+				<label for="postCategory">Category</label>
+
+				<select id="postCategory" name="category">
+
+					<option value="">Select a category</option>
+
+					{% for category in categories %}
+
+					<option value="{{ category.id }}" {% if post and post.category_id == category.id %}selected{% endif %}>
+
+						{{ category.name }}
+
+					</option>
+
 					{% endfor %}
+
+				</select>
+
+			</div>
+
+
+
+			<div class="form-group">
+
+				<label for="postTags">Tags <span
+
+						style="font-weight:400;color:var(--text-faint);">(comma-separated)</span></label>
+
+				<input type="text" id="postTags" name="tags"
+
+					value="{% if post %}{% for tag in post.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}"
+
+					placeholder="e.g. technology, design, lifestyle">
+
+				<div class="tag-suggestions" id="tagSuggestions" aria-live="polite"></div>
+
+				{% if popular_tags %}
+
+				<div class="popular-tags">
+
+					<span class="popular-tags-label">Popular tags</span>
+
+					<div class="popular-tags-list">
+
+						{% for tag in popular_tags %}
+
+						<button type="button" class="tag-chip" data-tag="{{ tag.name }}">{{ tag.name }}</button>
+
+						{% endfor %}
+
+					</div>
+
 				</div>
+
+				{% endif %}
+
 			</div>
-			{% endif %}
-		</div>
 
-		<div class="form-group">
-			<label for="postStatus">Status</label>
-			<select id="postStatus" name="status">
-				<option value="published" {% if post and post.status == 'published' %}selected{% endif %}>Published</option>
-				<option value="draft" {% if post and post.status == 'draft' %}selected{% endif %}>Draft</option>
-			</select>
-		</div>
 
-		<div class="form-group">
-			<label for="postImage">Featured Image</label>
-			<input type="file" id="postImage" name="featured_image" accept="image/*">
-			{% if post and post.featured_image %}
-			<div class="current-image-preview">
-				<p>Current image:</p>
-				<img src="{{ post.featured_image.url }}" alt="Current featured image" class="current-image">
+
+			<div class="form-group">
+
+				<label for="postStatus">Publish Status</label>
+
+				<select id="postStatus" name="status">
+
+					<option value="published" {% if post and post.status == 'published' %}selected{% endif %}>
+
+						Published
+
+					</option>
+
+					<option value="draft" {% if post and post.status == 'draft' %}selected{% endif %}>
+
+						Draft
+
+					</option>
+
+				</select>
+
 			</div>
-			{% endif %}
-		</div>
 
-		<div class="form-group">
-			<label for="postContent">Content</label>
-			<textarea id="postContent" name="content" rows="10" required>{% if post %}{{ post.content }}{% endif %}</textarea>
-		</div>
 
-		<button type="submit" class="btn-primary">
-			{% if mode == 'edit' %}Save Changes{% else %}Create Post{% endif %}
-		</button>
-	</form>
-	{% if all_tag_names %}
-	{{ all_tag_names|json_script:"allTagsData" }}
-	{% endif %}
+
+			<!-- featured image upload and preview removed -->
+
+			</div>
+
+
+
+			<div class="form-group">
+
+				<label for="postContent">Content</label>
+
+				<textarea id="postContent" name="content" rows="12" required
+
+					placeholder="Write your post here">{% if post %}{{ post.content }}{% endif %}</textarea>
+
+			</div>
+
+
+
+			<button type="submit" class="btn-primary btn-lg">
+
+				{% if mode == 'edit' %}
+
+				<i class="fa-solid fa-floppy-disk"></i> Save Changes
+
+				{% else %}
+
+				<i class="fa-solid fa-paper-plane"></i> Publish Post
+
+				{% endif %}
+
+			</button>
+
+		</form>
+
+
+
+		{% if all_tag_names %}
+
+		{{ all_tag_names|json_script:"allTagsData" }}
+
+		{% endif %}
+
+	</div>
+
 </div>
+
 {% endblock %}
 
+
+
 {% block extra_js %}
+
 <script src="{% static 'js/post_form.js' %}"></script>
+
 {% endblock %}

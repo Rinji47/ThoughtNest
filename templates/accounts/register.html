@@ -11,84 +11,68 @@
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
+            <span class="auth-logo">🪹</span>
             <h1>Join ThoughtNest</h1>
             <p>Create an account to start sharing your thoughts</p>
         </div>
 
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
         {% endif %}
 
         <form method="post" class="auth-form">
             {% csrf_token %}
-            
+
             <div class="form-group">
-                <label for="{{ form.username.id_for_label }}">Username</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                    <span class="error-message">{{ form.username.errors.0 }}</span>
-                {% endif %}
-                <small class="form-help">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</small>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-input" placeholder="Username" required
+                    autofocus>
+                <small class="form-help">Unique username for your account.</small>
             </div>
 
             <div class="form-group">
-                <label for="{{ form.email.id_for_label }}">Email</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                    <span class="error-message">{{ form.email.errors.0 }}</span>
-                {% endif %}
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="Email address" required>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="{{ form.first_name.id_for_label }}">First Name</label>
-                    {{ form.first_name }}
-                    {% if form.first_name.errors %}
-                        <span class="error-message">{{ form.first_name.errors.0 }}</span>
-                    {% endif %}
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="form-input"
+                        placeholder="First name (optional)">
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.last_name.id_for_label }}">Last Name</label>
-                    {{ form.last_name }}
-                    {% if form.last_name.errors %}
-                        <span class="error-message">{{ form.last_name.errors.0 }}</span>
-                    {% endif %}
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-input"
+                        placeholder="Last name (optional)">
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ form.password1.id_for_label }}">Password</label>
-                {{ form.password1 }}
-                {% if form.password1.errors %}
-                    <span class="error-message">{{ form.password1.errors.0 }}</span>
-                {% endif %}
-                <small class="form-help">At least 8 characters. Can't be entirely numeric.</small>
+                <label for="password1">Password</label>
+                <input type="password" id="password1" name="password1" class="form-input" placeholder="Password"
+                    required>
+                <small class="form-help">At least 8 characters long.</small>
             </div>
 
             <div class="form-group">
-                <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
-                {{ form.password2 }}
-                {% if form.password2.errors %}
-                    <span class="error-message">{{ form.password2.errors.0 }}</span>
-                {% endif %}
+                <label for="password2">Confirm Password</label>
+                <input type="password" id="password2" name="password2" class="form-input" placeholder="Confirm password"
+                    required>
             </div>
 
-            {% if form.non_field_errors %}
-                <div class="error-message">
-                    {{ form.non_field_errors.0 }}
-                </div>
-            {% endif %}
-
-            <button type="submit" class="btn-primary btn-full">Create Account</button>
+            <button type="submit" class="btn-primary btn-full">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+            </button>
         </form>
 
         <div class="auth-footer">
-            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+            <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
         </div>
     </div>
 </div>

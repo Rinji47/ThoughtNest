@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% load static %}
 
 {% block title %}Manage Comments - Admin{% endblock %}
@@ -8,35 +8,44 @@
 {% endblock %}
 
 {% block content %}
-
-
 <div class="admin-wrapper">
     {% include 'admin/sidebar.html' %}
     <div class="admin-content">
+        <h1>Comments Management</h1>
+
         {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             </div>
         {% endif %}
-        <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem 1.5rem 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
+
+        <!-- Modern Filter/Search Box -->
+        <form method="get" class="admin-filter-form" style="background: #fdf6ef; border-radius: 24px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(107,75,62,0.06); margin-bottom:2rem;">
             <div style="display: flex; flex-direction: column; gap: 1.1rem;">
+                
+                <!-- User Search Bar -->
+                <input 
+                    type="text" 
+                    name="user_search" 
+                    placeholder="Search users by username or name..." 
+                    value="{{ user_search }}" 
+                    style="border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.9rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
+
                 <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
-                    <select name="user" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
-                        <option value="">All Users</option>
-                        {% for user in users %}
-                            <option value="{{ user.id }}" {% if selected_user|stringformat:'s' == user.id|stringformat:'s' %}selected{% endif %}>{{ user.username }}</option>
-                        {% endfor %}
-                    </select>
+                    
+                    <!-- Post Filter -->
                     <select name="post" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                         <option value="">All Posts</option>
                         {% for post in posts %}
-                            <option value="{{ post.id }}" {% if selected_post|stringformat:'s' == post.id|stringformat:'s' %}selected{% endif %}>{{ post.title|truncatechars:30 }}</option>
+                            <option value="{{ post.id }}" {% if selected_post|stringformat:'s' == post.id|stringformat:'s' %}selected{% endif %}>
+                                {{ post.title|truncatechars:30 }}
+                            </option>
                         {% endfor %}
                     </select>
+
+                    <!-- Date Range Filter -->
                     <select name="date_range" style="flex: 1; border-radius: 12px; border: 1px solid #f2e5d7; padding: 0.7rem 1.1rem; font-size: 1.08rem; background: #fffaf5; color: #7a6a5a;">
                         <option value="">All Time</option>
                         <option value="today" {% if selected_date_range == 'today' %}selected{% endif %}>Today</option>
@@ -45,50 +54,53 @@
                         <option value="year" {% if selected_date_range == 'year' %}selected{% endif %}>Last Year</option>
                     </select>
                 </div>
+
+                <!-- Apply & Clear Buttons -->
                 <div style="margin-top: 0.5rem;">
-                    <button type="submit" class="btn-filter" style="background: #7a5642; color: #fff; border-radius: 10px; padding: 0.7rem 1.7rem; font-weight: 600; font-size: 1.08rem; border: none; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-magnifying-glass"></i> Apply</button>
-                    {% if selected_user or selected_post or selected_date_range %}
-                        <a href="{% url 'admin_comments' %}" class="btn-filter btn-filter-clear" style="margin-left: 0.7rem;"><i class="fa-solid fa-redo"></i> Clear</a>
+                    <button type="submit" class="btn-filter" style="background: #7a5642; color: #fff; border-radius: 10px; padding: 0.7rem 1.7rem; font-weight: 600; font-size: 1.08rem; border: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-magnifying-glass"></i> Apply
+                    </button>
+                    {% if user_search or selected_post or selected_date_range %}
+                        <a href="{% url 'admin_comments' %}" class="btn-filter btn-filter-clear" style="margin-left: 0.7rem;">
+                            <i class="fa-solid fa-redo"></i> Clear
+                        </a>
                     {% endif %}
                 </div>
             </div>
         </form>
-        <div class="comments-management-list">
-            {% for comment in comments %}
-            <div class="comment-item">
-                <div class="comment-content">
-                    <strong>
-                        {% if comment.author %}
-                            {{ comment.author.get_full_name|default:comment.author.username }}
-                        {% else %}
-                            Guest
-                        {% endif %}
-                    </strong>
-                    <span class="comment-date">{{ comment.created_at|timesince }} ago</span>
-                    <p>{{ comment.content }}</p>
-                    <small><strong>On:</strong> <a href="{% url 'post_detail' comment.post.pk %}">{{ comment.post.title }}</a></small>
-                </div>
-                <div class="comment-actions">
-                    {% if not comment.approved %}
-                    <form method="post" action="/admin/comment/{{ comment.pk }}/approve/" class="admin-form-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-approve">Approve</button>
-                    </form>
-                    {% endif %}
-                    <form method="post" action="/admin/comment/{{ comment.pk }}/delete/" class="admin-form-inline" onsubmit="return confirm('Delete this comment?');">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-delete">Delete</button>
-                    </form>
-                </div>
-            </div>
-            {% empty %}
-            <p class="admin-no-comments">No comments yet.</p>
-            {% endfor %}
-        </div>
+
+        <!-- Comments Table -->
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Author</th>
+                    <th>Username</th>
+                    <th>Comment</th>
+                    <th>Post</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                <tr>
+                    <td>{{ comment.author.get_full_name|default:comment.author.username }}</td>
+                    <td>{{ comment.author.username }}</td>
+                    <td>{{ comment.content|truncatechars:60 }}</td>
+                    <td><a href="{% url 'post_detail' comment.post.pk %}">{{ comment.post.title|truncatechars:40 }}</a></td>
+                    <td>{{ comment.created_at|date:"M d, Y H:i" }}</td>
+                    <td class="action-buttons">
+                        <form method="post" action="{% url 'admin_delete_comment' comment.pk %}" class="admin-form-inline" onsubmit="return confirm('Delete this comment?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-sm btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6">No comments found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/admin_dashboard.js' %}"></script>
 {% endblock %}
