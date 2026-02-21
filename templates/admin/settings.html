@@ -59,12 +59,6 @@
                         <textarea id="site_description" name="site_description" rows="3" class="form-input"
                             placeholder="A brief description of your site...">{{ site_settings.site_description|default:'' }}</textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="contact_email">Contact Email</label>
-                        <input type="email" id="contact_email" name="contact_email"
-                            value="{{ site_settings.contact_email|default:'' }}" class="form-input"
-                            placeholder="admin@example.com">
-                    </div>
                 </div>
                 <button type="submit" class="btn-primary settings-save-btn">
                     <i class="fa-solid fa-floppy-disk"></i> Save Site Info
