@@ -1,0 +1,368 @@
+/* ---- Posts Grid & Card ---- */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 2.5rem;
+}
+
+.post-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 2rem 1.5rem 1.5rem;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    transition: box-shadow var(--transition-slow), transform var(--transition-slow);
+}
+.post-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-6px);
+    border-color: var(--accent-color);
+}
+.post-category {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+}
+.post-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.2rem;
+}
+.post-excerpt {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+.post-meta {
+    display: flex;
+    gap: 1.2rem;
+    font-size: 0.95rem;
+    color: var(--text-faint);
+    align-items: center;
+}
+.post-actions {
+    margin-top: 0.5rem;
+}
+.read-more {
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.95rem;
+    transition: color var(--transition);
+}
+.read-more:hover {
+    color: var(--primary-color);
+}
+/* ========================================
+   Categories Page Styles
+   ======================================== */
+
+/* ---- Page header ---- */
+.categories-page-header {
+    text-align: center;
+    padding: 2.5rem 1.5rem 0;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    color: var(--text-dark);
+    margin-bottom: 0.4rem;
+}
+
+.page-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ---- Categories Grid ---- */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 3rem;
+}
+
+.category-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-slow);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.category-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    opacity: 0;
+    transition: opacity var(--transition-slow);
+}
+
+.category-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-color);
+}
+
+.category-card:hover::after {
+    opacity: 0.04;
+}
+
+.category-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--accent-soft), #fce8d4);
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    transition: all var(--transition);
+    position: relative;
+    z-index: 1;
+}
+
+.category-card:hover .category-icon {
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    color: white;
+    transform: scale(1.1);
+}
+
+.category-card h2 {
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+    color: var(--text-dark);
+    position: relative;
+    z-index: 1;
+}
+
+.category-count {
+    color: var(--text-faint);
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.category-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all var(--transition);
+    position: relative;
+    z-index: 1;
+}
+
+.category-card:hover .category-link {
+    color: var(--primary-color);
+    gap: 0.5rem;
+}
+
+/* ---- Tags Section ---- */
+.tags-section {
+    background: linear-gradient(135deg, #fdf6ee 0%, #f9edd9 100%);
+    padding: 2rem 2rem;
+    border-radius: var(--radius);
+    margin-bottom: 3rem;
+    border: 1px solid var(--border-color);
+}
+
+.tags-section .section-title {
+    margin-bottom: 1.3rem;
+    font-size: 1.35rem;
+    text-align: left;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.tag {
+    display: inline-block;
+    background-color: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    transition: all var(--transition);
+    text-decoration: none;
+}
+
+.tag:hover {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* ---- Category Posts Section ---- */
+.category-posts {
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+}
+
+.category-posts .section-title {
+    margin-bottom: 2rem;
+}
+
+.category-section {
+    margin-bottom: 3rem;
+}
+
+.category-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border-color);
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.category-heading {
+    font-size: 1.4rem;
+    color: var(--text-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.category-heading::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 1.2em;
+    background: linear-gradient(to bottom, var(--accent-color), var(--primary-color));
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.category-see-all {
+    font-size: 0.82rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color var(--transition);
+}
+
+.category-see-all:hover {
+    color: var(--primary-color);
+}
+
+.small-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.2rem;
+}
+
+.small-post {
+    background: var(--bg-card);
+    padding: 1.3rem 1.4rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.small-post:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow);
+    border-left-color: var(--accent-color);
+}
+
+.small-post h4 {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.small-post h4 a {
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: color var(--transition);
+}
+
+.small-post h4 a:hover {
+    color: var(--accent-color);
+}
+
+.small-post-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+
+    .small-posts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tags-section .section-title {
+        text-align: center;
+    }
+
+    .tags-container {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .categories-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem;
+    }
+
+    .category-card {
+        padding: 1.3rem 1rem;
+    }
+
+    .category-heading {
+        font-size: 1.15rem;
+    }
+}

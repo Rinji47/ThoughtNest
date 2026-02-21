@@ -1,0 +1,274 @@
+/* ========================================
+   Profile Settings Styles
+   ======================================== */
+
+/* ---- Settings Panels ---- */
+.settings-panel {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 1.75rem;
+}
+
+.settings-panel--danger {
+    border-color: rgba(194, 90, 74, 0.3);
+}
+
+.settings-panel__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-subtle);
+}
+
+.settings-panel--danger .settings-panel__header {
+    background: rgba(194, 90, 74, 0.05);
+    border-color: rgba(194, 90, 74, 0.15);
+}
+
+.settings-panel__header>i {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+}
+
+.settings-panel--danger .settings-panel__header>i {
+    background: rgba(194, 90, 74, 0.1);
+    color: var(--danger-color);
+}
+
+.settings-panel__header h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 0.2rem;
+    font-family: var(--font-body);
+}
+
+.settings-panel--danger .settings-panel__header h2 {
+    color: var(--danger-color);
+}
+
+.settings-panel__header p {
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    margin: 0;
+}
+
+.settings-panel__body {
+    padding: 1.5rem;
+}
+
+/* ---- Avatar Row ---- */
+.settings-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border-color);
+}
+
+.avatar-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-soft), #e8d5c2);
+    color: var(--primary-color);
+    font-size: 1.75rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--border-color);
+    font-family: var(--font-display);
+}
+
+.form-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.file-input {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+
+.input-hint {
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    margin: 0.3rem 0 0;
+}
+
+/* ---- Settings Form Grid ---- */
+.settings-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    margin-bottom: 1.25rem;
+}
+
+/* ---- Sub Heading ---- */
+.settings-sub-heading {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin: 1.5rem 0 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--border-color);
+}
+
+/* ---- Profile Toggles ---- */
+.profile-toggles {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.toggle-row-sm {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.toggle-row-sm:last-child {
+    border-bottom: none;
+}
+
+.toggle-row-sm:hover {
+    background: var(--bg-subtle);
+}
+
+.toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.toggle-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.toggle-desc {
+    font-size: 0.76rem;
+    color: var(--text-faint);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #d0c8c0;
+    border-radius: 999px;
+    transition: background 0.25s;
+    cursor: pointer;
+}
+
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+    background: var(--accent-color);
+}
+
+.toggle-switch input:checked+.toggle-slider::before {
+    transform: translateX(20px);
+}
+
+/* ---- Danger button ---- */
+.btn-outline-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    border: 2px solid var(--danger-color);
+    border-radius: 999px;
+    color: var(--danger-color);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all var(--transition);
+    text-decoration: none;
+}
+
+.btn-outline-danger:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+    .settings-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-avatar-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
