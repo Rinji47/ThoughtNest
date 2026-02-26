@@ -12,6 +12,15 @@
     #tagSearchSuggestions div:hover {
         background: #e8d6c1;
     }
+
+    /* Ensure form field height increase applies even when static CSS is cached */
+    #postTitle,
+    #postCategory,
+    #postTags,
+    #postStatus {
+        min-height: 56px !important;
+        padding: 0.85rem 1rem !important;
+    }
 </style>
 {% endblock %}
 
@@ -82,7 +91,7 @@
 				{{ all_tag_names|json_script:"allTagsData" }}
 				<div class="tag-search-wrapper" style="margin-top:0.7rem; position:relative;">
 					<input type="text" id="tagSearchInput" placeholder="Search tags..."
-						style="width:100%; padding:0.5rem 0.7rem; border-radius:12px; border:1px solid #f2e5d7; background:#fffaf5; color:#7a6a5a;">
+						style="width:100%; min-height:56px; padding:0.85rem 1rem; border-radius:12px; border:1px solid #f2e5d7; background:#fffaf5; color:#7a6a5a;">
 					<div id="tagSearchSuggestions" style="position:absolute; top:100%; left:0; width:100%; background:#fffaf5; border:1px solid #f2e5d7; border-radius:12px; max-height:200px; overflow-y:auto; z-index:10;"></div>
 				</div>
 				{% endif %}

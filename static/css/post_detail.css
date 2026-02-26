@@ -453,6 +453,21 @@
     background: linear-gradient(90deg, var(--primary-color) 0%, var(--accent-color) 100%);
 }
 
+.post-form input[type="text"],
+.post-form input[type="url"],
+.post-form input[type="email"],
+.post-form input[type="number"],
+.post-form select {
+    min-height: 56px;
+    padding: 0.85rem 1rem;
+}
+
+.post-form textarea {
+    min-height: 360px;
+    padding: 1rem 1.1rem;
+    line-height: 1.6;
+}
+
 .current-image-preview {
     margin-top: 0.75rem;
     padding: 0.75rem;
